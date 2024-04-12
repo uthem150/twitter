@@ -6,6 +6,8 @@ import Login from "./routes/login";
 import CreateAccount from "./routes/create-account";
 import { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
+import { useEffect, useState } from "react";
+import LoadingScreen from "./components/loading-screen";
 
 //애플리케이션의 라우트를 정의하는 배열을 생성 -  router : 페이지 간의 이동 기능을 제공
 const router = createBrowserRouter([
@@ -52,10 +54,18 @@ const GlobalStyles = createGlobalStyle`
 `;
 
 function App() {
+  const [isLoading, setLoading] = useState(true);
+  const init = async () => {
+    //파이어베이스가 준비될 때 까지 기다려줌
+    setLoading(false);
+  };
+  useEffect(() => {
+    init();
+  }, []);
   return (
     <>
       <GlobalStyles /> {/*글로벌 스타일(GlobalStyles) 적용*/}
-      <RouterProvider router={router} />{" "}
+      {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
       {/*배열을 RouterProvider의 router prop으로 전달하여 라우팅이 적용되도록 함*/}
     </>
   );
