@@ -4,7 +4,7 @@ import Home from "./routes/home";
 import Profile from "./routes/profile";
 import Login from "./routes/login";
 import CreateAccount from "./routes/create-account";
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle, styled } from "styled-components";
 import reset from "styled-reset";
 import { useEffect, useState } from "react";
 import LoadingScreen from "./components/loading-screen";
@@ -54,6 +54,13 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+// 앱 전체를 Wrapper로 감싸면, 모든게 화면 가운데로 위치
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+`;
+
 function App() {
   const [isLoading, setLoading] = useState(true);
   const init = async () => {
@@ -66,11 +73,11 @@ function App() {
     init();
   }, []);
   return (
-    <>
+    <Wrapper>
       <GlobalStyles /> {/*글로벌 스타일(GlobalStyles) 적용*/}
       {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
       {/*배열을 RouterProvider의 router prop으로 전달하여 라우팅이 적용되도록 함*/}
-    </>
+    </Wrapper>
   );
 }
 
