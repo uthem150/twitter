@@ -8,6 +8,7 @@ import { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
 import { useEffect, useState } from "react";
 import LoadingScreen from "./components/loading-screen";
+import { auth } from "./firebase";
 
 //애플리케이션의 라우트를 정의하는 배열을 생성 -  router : 페이지 간의 이동 기능을 제공
 const router = createBrowserRouter([
@@ -56,7 +57,9 @@ const GlobalStyles = createGlobalStyle`
 function App() {
   const [isLoading, setLoading] = useState(true);
   const init = async () => {
-    //파이어베이스가 준비될 때 까지 기다려줌
+    // firebase가 쿠키와 토큰을 읽고 백엔드와 소통해서 로그인 정보를 확인하는 동안 기다리겠다.
+    // authStateReady : 최초 인증 상태가 완료될 때, 실행되는 Promise를 return
+    await auth.authStateReady();
     setLoading(false);
   };
   useEffect(() => {
