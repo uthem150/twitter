@@ -1,5 +1,8 @@
 import { styled } from "styled-components";
 import { useState } from "react";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -52,6 +55,7 @@ export default function CreateAccount() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   // React에서 입력 요소(input element)의 변경 이벤트를 처리하는 함수 (onChange라는 상수에 함수를 할당)
   // e는 변경 이벤트 객체이며, React.ChangeEvent<HTMLInputElement> 타입
@@ -71,12 +75,23 @@ export default function CreateAccount() {
   };
 
   // 폼 제출 이벤트가 발생할 때 호출
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //이벤트의 기본 동작을 방지하는 메서드. 폼 제출 시 기본적으로 페이지가 새로고침되거나 서버로 데이터가 전송되는 것을 방지
+    if (isLoading || name === "" || email === "" || password === "") return; //loading중이거나, name or email or password 비어있으면, 함수 종료
     try {
+      setLoading(true);
       // create an account
-      // set the name of user
+      const credentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      ); //인증객체, email, pw필요
+      console.log(credentials.user);
+      //계정을 만든 뒤에, 사용자 이름 설정
+      await updateProfile(credentials.user, { displayName: name });
+
       // redirect to the homepage
+      navigate("/");
     } catch {
       //setError
     } finally {
@@ -85,7 +100,7 @@ export default function CreateAccount() {
   };
   return (
     <Wrapper>
-      <Title>Log into 𝕏</Title>
+      <Title>Join 𝕏</Title>
       <Form onSubmit={onSubmit}>
         <Input
           onChange={onChange}

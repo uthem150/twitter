@@ -13,5 +13,5 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// app에 대해 인증을 사용하겠다
+// app에 대해 인증을 사용하겠다 - 인증 인스턴스
 export const auth = getAuth(app);
