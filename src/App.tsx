@@ -9,6 +9,7 @@ import reset from "styled-reset";
 import { useEffect, useState } from "react";
 import LoadingScreen from "./components/loading-screen";
 import { auth } from "./firebase";
+import ProtectedRoute from "./components/protected-route";
 
 //애플리케이션의 라우트를 정의하는 배열을 생성 -  router : 페이지 간의 이동 기능을 제공
 const router = createBrowserRouter([
@@ -17,7 +18,11 @@ const router = createBrowserRouter([
     // element: 해당 경로에 접속했을 때 렌더링할 컴포넌트를 지정
     // children : //중첩된 라우트를 정의
     path: "/",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "", // localhost/
