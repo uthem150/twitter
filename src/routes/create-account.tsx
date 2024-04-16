@@ -3,6 +3,11 @@ import { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
+
+// const errors = {
+//   "auth/email-already-in-use" : "That email already exist"
+// }
 
 const Wrapper = styled.div`
   height: 100%;
@@ -19,6 +24,7 @@ const Title = styled.h1`
 
 const Form = styled.form`
   margin-top: 50px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -77,6 +83,8 @@ export default function CreateAccount() {
   // 폼 제출 이벤트가 발생할 때 호출
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //이벤트의 기본 동작을 방지하는 메서드. 폼 제출 시 기본적으로 페이지가 새로고침되거나 서버로 데이터가 전송되는 것을 방지
+    setError(""); //error message초기화
+    
     if (isLoading || name === "" || email === "" || password === "") return; //loading중이거나, name or email or password 비어있으면, 함수 종료
     try {
       setLoading(true);
@@ -92,8 +100,11 @@ export default function CreateAccount() {
 
       // redirect to the homepage
       navigate("/");
-    } catch {
+    } catch (e) {
       //setError
+      if (e instanceof FirebaseError) {
+        setError(e.message);
+      }
     } finally {
       setLoading(false);
     }
