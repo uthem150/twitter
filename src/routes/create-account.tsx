@@ -2,7 +2,7 @@ import { styled } from "styled-components";
 import { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 
 // const errors = {
@@ -53,6 +53,13 @@ const Error = styled.span`
   color: tomato;
 `;
 
+const Switcher = styled.span`
+  margin-top: 20px;
+  a {
+    color: #1d9bf0;
+  }
+`;
+
 export default function CreateAccount() {
   const [isLoading, setLoading] = useState(false);
 
@@ -84,7 +91,7 @@ export default function CreateAccount() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //이벤트의 기본 동작을 방지하는 메서드. 폼 제출 시 기본적으로 페이지가 새로고침되거나 서버로 데이터가 전송되는 것을 방지
     setError(""); //error message초기화
-    
+
     if (isLoading || name === "" || email === "" || password === "") return; //loading중이거나, name or email or password 비어있으면, 함수 종료
     try {
       setLoading(true);
@@ -144,6 +151,10 @@ export default function CreateAccount() {
         />
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
+      <Switcher>
+        Already have an account? <Link to="/login">log in &rarr;</Link>{" "}
+        {/*&rarr는 right arrow*/}
+      </Switcher>
     </Wrapper>
   );
 }

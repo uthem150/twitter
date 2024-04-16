@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
 import { useState } from "react";
 import { auth } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
@@ -51,6 +51,13 @@ const Input = styled.input`
 const Error = styled.span`
   font-weight: 600;
   color: tomato;
+`;
+
+const Switcher = styled.span`
+  margin-top: 20px;
+  a {
+    color: #1d9bf0;
+  }
 `;
 
 export default function CreateAccount() {
@@ -124,6 +131,11 @@ export default function CreateAccount() {
         />
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
+      <Switcher>
+        Don't have an account?{" "}
+        <Link to="/create-account">Create one &rarr;</Link>{" "}
+        {/*&rarr는 right arrow*/}
+      </Switcher>
     </Wrapper>
   );
 }
