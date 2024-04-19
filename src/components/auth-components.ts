@@ -32,6 +32,8 @@ export const Input = styled.input`
   // type이 submit이면, cursor을 포인터로 변경
   &[type="submit"] {
     cursor: pointer;
+    background-color: #1d9bf0;
+    color: white;
     // hover상황에서는 버튼 색을 변경
     &:hover {
       opacity: 0.8;
