@@ -2,7 +2,10 @@ import { useState } from "react";
 import { auth } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import {
   Form,
   Error,
@@ -55,6 +58,7 @@ export default function CreateAccount() {
       setLoading(false);
     }
   };
+
   return (
     <Wrapper>
       <Title>Log into 𝕏</Title>
@@ -82,6 +86,11 @@ export default function CreateAccount() {
         />
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
+      <Switcher>
+        Did you forget the password?{" "}
+        <Link to="/reset-password">Reset Password &rarr;</Link>{" "}
+        {/*&rarr는 right arrow*/}
+      </Switcher>
       <Switcher>
         Don't have an account?{" "}
         <Link to="/create-account">Create one &rarr;</Link>{" "}

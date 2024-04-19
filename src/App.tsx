@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import LoadingScreen from "./components/loading-screen";
 import { auth } from "./firebase";
 import ProtectedRoute from "./components/protected-route";
+import ResetPassword from "./routes/reset-password";
 
 //애플리케이션의 라우트를 정의하는 배열을 생성 -  router : 페이지 간의 이동 기능을 제공
 const router = createBrowserRouter([
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
   {
     path: "/create-account",
     element: <CreateAccount />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
 ]);
 
