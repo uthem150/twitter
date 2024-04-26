@@ -1,5 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
+import { auth, db } from "../firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 const Form = styled.form`
   display: flex;
@@ -75,8 +77,28 @@ export default function PostTweetForm() {
       setFile(files[0]);
     }
   };
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user || isLoading || tweet === "" || tweet.length > 180) return; //login되어있지 않거나, 로딩중이나, 내용이 비어있거나, 180자가 넘어가면, 데이터를 추가하지 않음
+    //tweet이 있다면
+    try {
+      setLoading(true);
+      await addDoc(collection(db, "tweets"), {
+        tweet,
+        createdAt: Date.now(), //트윗이 생성된 시간을 밀리세컨드 단위로 기록
+        username: user.displayName || "Anonymous", //이름 존재하지 않으면 Anonymous표시
+        userId: user.uid, //나중에 삭제할 수 있도록, 트윗을 생성한 사용자 ID저장
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <Form>
+    <Form onSubmit={onSubmit}>
       <TextArea
         rows={5}
         maxLength={180}

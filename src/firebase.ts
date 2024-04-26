@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC132Lyc05XtHEPOyqp_GMbWYLUTf--cvQ",
@@ -15,3 +17,6 @@ const app = initializeApp(firebaseConfig);
 
 // app에 대해 인증을 사용하겠다 - 인증 인스턴스
 export const auth = getAuth(app);
+
+export const storage = getStorage(app); //firebase storage사용
+export const db = getFirestore(app); //firebase database사용
