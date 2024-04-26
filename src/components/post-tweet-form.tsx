@@ -79,14 +79,16 @@ export default function PostTweetForm() {
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const user = auth.currentUser;
+    e.preventDefault(); //폼 제출 시 브라우저가 페이지 새로고침하는 기본 동작 방지
+    const user = auth.currentUser; //현재 로그인한 사용자의 정보를 가져옴. 만약 user가 null이라면, 로그인하지 않은 상태
+
     if (!user || isLoading || tweet === "" || tweet.length > 180) return; //login되어있지 않거나, 로딩중이나, 내용이 비어있거나, 180자가 넘어가면, 데이터를 추가하지 않음
     //tweet이 있다면
     try {
       setLoading(true);
+      //firebase의 addDoc함수로 tweets 컬렉션 db에 새 문서를 추가 (firebase instance, 저장할 collection 장소의 이름)
       await addDoc(collection(db, "tweets"), {
-        tweet,
+        tweet, //내용
         createdAt: Date.now(), //트윗이 생성된 시간을 밀리세컨드 단위로 기록
         username: user.displayName || "Anonymous", //이름 존재하지 않으면 Anonymous표시
         userId: user.uid, //나중에 삭제할 수 있도록, 트윗을 생성한 사용자 ID저장
