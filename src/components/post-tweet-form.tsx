@@ -1,7 +1,8 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { auth, db } from "../firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { auth, db, storage } from "../firebase";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const Form = styled.form`
   display: flex;
@@ -87,12 +88,29 @@ export default function PostTweetForm() {
     try {
       setLoading(true);
       //firebase의 addDoc함수로 tweets 컬렉션 db에 새 문서를 추가 (firebase instance, 저장할 collection 장소의 이름)
-      await addDoc(collection(db, "tweets"), {
+      const doc = await addDoc(collection(db, "tweets"), {
         tweet, //내용
         createdAt: Date.now(), //트윗이 생성된 시간을 밀리세컨드 단위로 기록
         username: user.displayName || "Anonymous", //이름 존재하지 않으면 Anonymous표시
         userId: user.uid, //나중에 삭제할 수 있도록, 트윗을 생성한 사용자 ID저장
       });
+      //이미지가 첨부된다면 저장될 경로
+      if (file) {
+        //file을 첨부하면, 파일 위치에 대한 reference를 받음 (tweets/(유저id-유저이름)/(문서id))
+        const locationRef = ref(
+          storage, //firebase storage instance
+          `tweets/${user.uid}-${user.displayName}/${doc.id}` // 파일이 어디에 저장될 지 url(유저가 올리는 모든 파일은 해당 유저의 파일에 저장) - 유저 이름을 폴더 명에 추가, 이미지 이름은 업로드된 트윗의 id로
+        );
+        const result = await uploadBytes(locationRef, file); //파일을 어디에 저장하고 싶은지 지정
+        const url = await getDownloadURL(result.ref); //result의 public url을 반환하는 함수(string을 반환하는 promise)
+
+        // updateDoc(document 참조, 업데이터 할 데이터)
+        await updateDoc(doc, {
+          photo: url,
+        }); //tweet document에 이미지 url을 추가함
+        setTweet(""); //업로드 이후 리셋 시킴
+        setFile(null);
+      }
     } catch (e) {
       console.log(e);
     } finally {
@@ -102,6 +120,7 @@ export default function PostTweetForm() {
   return (
     <Form onSubmit={onSubmit}>
       <TextArea
+        required //필수로 내용은 있어야 submit가능
         rows={5}
         maxLength={180}
         onChange={onChange}
