@@ -62,6 +62,9 @@ const GlobalStyles = createGlobalStyle`
     color:white;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
+  ::-webkit-scrollbar { //스크롤 기능은 유지하되, 스크롤바 없애기
+    display:none;
+  }
 `;
 
 // 앱 전체를 Wrapper로 감싸면, 모든게 화면 가운데로 위치
