@@ -115,9 +115,9 @@ export default function PostTweetForm() {
         await updateDoc(doc, {
           photo: url,
         }); //tweet document에 이미지 url을 추가함
-        setTweet(""); //업로드 이후 리셋 시킴
-        setFile(null);
       }
+      setTweet(""); //업로드 이후 리셋 시킴
+      setFile(null);
     } catch (e) {
       console.log(e);
     } finally {
