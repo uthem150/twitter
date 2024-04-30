@@ -1,9 +1,10 @@
 import styled from "styled-components";
 import { ITweet } from "./timeline";
 import { auth, db, storage } from "../firebase";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { useState } from "react";
+import EditTweetForm from "./edit-tweet-form";
 
 const Wrapper = styled.div`
   display: grid;
@@ -39,31 +40,12 @@ const DeleteButton = styled.div`
   width: 25px;
 `;
 
-const TextArea = styled.textarea`
-  margin-top: 5px;
-  border: 2px solid white;
-  padding: 20px;
-  border-radius: 20px;
-  font-size: 16px;
-  color: white;
-  background-color: black;
-  width: 100%;
-  resize: none; //textarea 크기 조정기능 제거
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  &:focus {
-    // textarea 클릭하면, 테두리 색상 변경
-    outline: none;
-    border-color: #1d9bf0;
-  }
-`;
-
 const EditButton = styled(DeleteButton)``; // 스타일은 삭제 버튼과 동일
 
 export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
   const user = auth.currentUser;
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedTweet, setEditedTweet] = useState(tweet);
+  const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
+  const [editedTweet, setEditedTweet] = useState(tweet); //수정 후 텍스트
 
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this tweet?");
@@ -85,25 +67,12 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
   };
 
   const onEdit = () => {
-    if (isEditing) {
-      // 이미 편집 모드일 경우, 수정을 저장
-      onSaveEdit();
-    } else {
-      // 편집 모드가 아닐 경우, 편집 모드를 활성화
-      setIsEditing(true);
-    }
+    setIsEditing(true); // 편집 모드 활성화
   };
 
-  const onSaveEdit = async () => {
-    if (user?.uid !== userId || tweet === "" || tweet.length > 180) return; // userId가 일치하지 않으면 종료
-    try {
-      await updateDoc(doc(db, "tweets", id), {
-        tweet: editedTweet,
-      });
-      setIsEditing(false);
-    } catch (e) {
-      console.error(e);
-    }
+  const onEditSuccess = (newTweet: string) => {
+    setEditedTweet(newTweet); // 새로운 트윗 내용으로 상태 업데이트
+    setIsEditing(false); // 편집 모드 종료
   };
 
   return (
@@ -111,13 +80,12 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
       <Column>
         <Username>{username}</Username>
         {isEditing ? (
-          <TextArea
-            required //필수로 내용은 있어야 submit가능
-            rows={5}
-            maxLength={180}
+          <EditTweetForm
             value={editedTweet}
-            onChange={(e) => setEditedTweet(e.target.value)}
-          />
+            tweetId={id}
+            onEditSuccess={onEditSuccess}
+            photo={photo}
+          ></EditTweetForm>
         ) : (
           <Payload>{tweet}</Payload>
         )}
@@ -125,24 +93,7 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
         {user?.uid === userId ? (
           <>
             <EditButton onClick={onEdit}>
-              {isEditing ? (
-                // 수정 완료(체크 마크) 아이콘 SVG 코드
-                <svg
-                  data-slot="icon"
-                  fill="none"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m4.5 12.75 6 6 9-13.5"
-                  ></path>
-                </svg>
-              ) : (
+              {isEditing ? null : (
                 // 수정(펜) 아이콘 SVG 코드
                 <svg
                   data-slot="icon"
@@ -158,7 +109,6 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
                     strokeLinejoin="round"
                     d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
                   ></path>
-                  {/* 펜 아이콘의 SVG path */}
                 </svg>
               )}
             </EditButton>

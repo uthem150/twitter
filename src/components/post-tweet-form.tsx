@@ -106,7 +106,7 @@ export default function PostTweetForm() {
         //file을 첨부하면, 파일 위치에 대한 reference를 받음 (tweets/(유저id-유저이름)/(문서id))
         const locationRef = ref(
           storage, //firebase storage instance
-          `tweets/${user.uid}-${user.displayName}/${doc.id}` // 파일이 어디에 저장될 지 url(유저가 올리는 모든 파일은 해당 유저의 파일에 저장) - 유저 이름을 폴더 명에 추가, 이미지 이름은 업로드된 트윗의 id로
+          `tweets/${user.uid}/${doc.id}` // 파일이 어디에 저장될 지 url(유저가 올리는 모든 파일은 해당 유저의 파일에 저장) - 유저 이름을 폴더 명에 추가, 이미지 이름은 업로드된 트윗의 id로
         );
         const result = await uploadBytes(locationRef, file); //파일을 어디에 저장하고 싶은지 지정
         const url = await getDownloadURL(result.ref); //result의 public url을 반환하는 함수(string을 반환하는 promise)

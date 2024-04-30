@@ -1,8 +1,13 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { auth, db, storage } from "../firebase";
-import { addDoc, collection, updateDoc } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { doc, updateDoc } from "firebase/firestore";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 
 const Form = styled.form`
   display: flex;
@@ -21,10 +26,6 @@ const TextArea = styled.textarea`
   resize: none; //textarea 크기 조정기능 제거
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  &::placeholder {
-    //placeholder의 폰트 크기 설정
-    font-size: 16px;
-  }
   &:focus {
     // textarea 클릭하면, 테두리 색상 변경
     outline: none;
@@ -63,10 +64,23 @@ const SubmitBtn = styled.input`
   }
 `;
 
-export default function EditTweetForm() {
+interface EditTweetFormProps {
+  value: string;
+  tweetId: string; // tweetId의 타입을 명시적으로 `string`으로 선언
+  onEditSuccess: (newTweet: string) => void;
+  photo?: string; // 이전에 업로드된 사진의 URL (없을 수도 있음)
+}
+
+export default function EditTweetForm({
+  value,
+  tweetId,
+  onEditSuccess,
+  photo,
+}: EditTweetFormProps) {
   const [isLoading, setLoading] = useState(false);
-  const [tweet, setTweet] = useState(""); //트윗의 내용 저장
+  const [tweet, setTweet] = useState(value); //초기값 파라미터로부터 받음
   const [file, setFile] = useState<File | null>(null); //첨부 파일의 내용 저장 (파일의 값은 file이거나 null)
+
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTweet(e.target.value);
   };
@@ -94,36 +108,39 @@ export default function EditTweetForm() {
     //tweet이 있다면
     try {
       setLoading(true);
-      //firebase의 addDoc함수로 tweets 컬렉션 db에 새 문서를 추가 (firebase instance, 저장할 collection 장소의 이름)
-      const doc = await addDoc(collection(db, "tweets"), {
-        tweet, //내용
-        createdAt: Date.now(), //트윗이 생성된 시간을 밀리세컨드 단위로 기록
-        username: user.displayName || "Anonymous", //이름 존재하지 않으면 Anonymous표시
-        userId: user.uid, //나중에 삭제할 수 있도록, 트윗을 생성한 사용자 ID저장
+      const tweetRef = doc(db, "tweets", tweetId); // 수정할 트윗의 문서 참조 생성
+
+      await updateDoc(tweetRef, {
+        tweet,
+        updatedAt: Date.now(), // 수정된 시간 추가
       });
-      //이미지가 첨부된다면 저장될 경로
+
       if (file) {
+        if (photo) {
+          const originRef = ref(storage, `tweets/${user.uid}/${tweetId}`);
+          await deleteObject(originRef);
+        }
         //file을 첨부하면, 파일 위치에 대한 reference를 받음 (tweets/(유저id-유저이름)/(문서id))
         const locationRef = ref(
           storage, //firebase storage instance
-          `tweets/${user.uid}-${user.displayName}/${doc.id}` // 파일이 어디에 저장될 지 url(유저가 올리는 모든 파일은 해당 유저의 파일에 저장) - 유저 이름을 폴더 명에 추가, 이미지 이름은 업로드된 트윗의 id로
+          `tweets/${user.uid}/${tweetId}` // 파일이 어디에 저장될 지 url(유저가 올리는 모든 파일은 해당 유저의 파일에 저장) - 유저 이름을 폴더 명에 추가, 이미지 이름은 업로드된 트윗의 id로
         );
         const result = await uploadBytes(locationRef, file); //파일을 어디에 저장하고 싶은지 지정
         const url = await getDownloadURL(result.ref); //result의 public url을 반환하는 함수(string을 반환하는 promise)
 
         // updateDoc(document 참조, 업데이트 할 데이터)
-        await updateDoc(doc, {
+        await updateDoc(tweetRef, {
           photo: url,
         }); //tweet document에 이미지 url을 추가함
       }
-      setTweet(""); //업로드 이후 리셋 시킴
-      setFile(null);
+      onEditSuccess(tweet); // 편집 성공 후 콜백 호출
     } catch (e) {
       console.log(e);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <Form onSubmit={onSubmit}>
       <TextArea
@@ -134,19 +151,19 @@ export default function EditTweetForm() {
         value={tweet}
         placeholder="What is happening?"
       />
-      <AttatchFileButton htmlFor="file">
-        {file ? "Photo added ✅" : "Add photo"}
+      <AttatchFileButton htmlFor={`file${tweetId}`}>
+        {file ? "Photo added ✅" : photo ? "Change photo" : "Add photo"}
       </AttatchFileButton>
       <AttatchFileInput
         onChange={onFileChange}
         type="file"
-        id="file"
+        id={`file${tweetId}`}
         accept="image/*"
       />
       {/*file이라는 id를 갖고, 이미지 파일만 받는데, 확장자는 상관x*/}
       <SubmitBtn
         type="submit"
-        value={isLoading ? "Posting..." : "Post tweet"}
+        value={isLoading ? "Loading..." : "Edit Tweet"}
       />
     </Form>
   );
