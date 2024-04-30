@@ -63,7 +63,7 @@ const SubmitBtn = styled.input`
   }
 `;
 
-export default function PostTweetForm() {
+export default function EditTweetForm() {
   const [isLoading, setLoading] = useState(false);
   const [tweet, setTweet] = useState(""); //트윗의 내용 저장
   const [file, setFile] = useState<File | null>(null); //첨부 파일의 내용 저장 (파일의 값은 file이거나 null)
