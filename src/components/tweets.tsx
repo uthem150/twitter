@@ -27,6 +27,7 @@ const Username = styled.span``;
 const Payload = styled.p`
   margin: 10px 0px;
   font-size: 18px;
+  word-break: break-all; /* 모든 문자에서 줄바꿈을 허용 */
 `;
 
 const DeleteButton = styled.div`
