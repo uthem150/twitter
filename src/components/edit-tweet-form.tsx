@@ -64,6 +64,7 @@ const SubmitBtn = styled.input`
   }
 `;
 
+//컴포넌트에 전달되는 props의 타입 정의
 interface EditTweetFormProps {
   value: string;
   tweetId: string; // tweetId의 타입을 명시적으로 `string`으로 선언
@@ -71,6 +72,7 @@ interface EditTweetFormProps {
   photo?: string; // 이전에 업로드된 사진의 URL (없을 수도 있음)
 }
 
+//props를 통해 초기값, 트윗 ID, 편집 성공 시 실행될 콜백 함수, 사진 URL을 받음
 export default function EditTweetForm({
   value,
   tweetId,
@@ -81,13 +83,17 @@ export default function EditTweetForm({
   const [tweet, setTweet] = useState(value); //초기값 파라미터로부터 받음
   const [file, setFile] = useState<File | null>(null); //첨부 파일의 내용 저장 (파일의 값은 file이거나 null)
 
+  //텍스트 영역의 내용이 변경될 때 실행될 이벤트 핸들러 함수
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTweet(e.target.value);
   };
+
   // 업로드 이미지 최대 용량 지정 - 3MB
   const maxSize = 3 * 1024 * 1024;
+
+  //파일 입력 필드의 값이 변경될 때 실행될 이벤트 핸들러 함수
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //타입이 file인 input이 변경될 때 마다, 파일이 배열을 받게 됨 (어떤 input은 복수의 파일을 업로드하게 하기 때문)
+    //파일의 크기를 검사하고 조건에 맞는 파일만 상태에 저장
     const { files } = e.target;
     // 파일 업로드 용량제한 설정
     if (files && files[0].size > maxSize) {
@@ -100,6 +106,7 @@ export default function EditTweetForm({
     }
   };
 
+  //폼 제출 시 실행될 이벤트 핸들러 함수
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //폼 제출 시 브라우저가 페이지 새로고침하는 기본 동작 방지
     const user = auth.currentUser; //현재 로그인한 사용자의 정보를 가져옴. 만약 user가 null이라면, 로그인하지 않은 상태
@@ -117,18 +124,20 @@ export default function EditTweetForm({
 
       if (file) {
         if (photo) {
-          const originRef = ref(storage, `tweets/${user.uid}/${tweetId}`);
-          await deleteObject(originRef);
+          //이전에 첨부된 사진이 있을 경우 삭제
+          const originRef = ref(storage, `tweets/${user.uid}/${tweetId}`); //Firebase Storage 인스턴스, 저장 경로
+          await deleteObject(originRef); //생성한 참조를 바탕으로, 해당 사진을 Firebase Storage에서 삭제
         }
-        //file을 첨부하면, 파일 위치에 대한 reference를 받음 (tweets/(유저id-유저이름)/(문서id))
+
+        //업로드될 파일의 위치에 대한 참조를 생성 (tweets/(유저id-유저이름)/(문서id))
         const locationRef = ref(
-          storage, //firebase storage instance
+          storage, //firebase storage 인스턴스
           `tweets/${user.uid}/${tweetId}` // 파일이 어디에 저장될 지 url(유저가 올리는 모든 파일은 해당 유저의 파일에 저장) - 유저 이름을 폴더 명에 추가, 이미지 이름은 업로드된 트윗의 id로
         );
-        const result = await uploadBytes(locationRef, file); //파일을 어디에 저장하고 싶은지 지정
-        const url = await getDownloadURL(result.ref); //result의 public url을 반환하는 함수(string을 반환하는 promise)
+        const result = await uploadBytes(locationRef, file); //파일을 실제로 Storage에 업로드 (업로드할 위치, 첨부파일 객체)
+        const url = await getDownloadURL(result.ref); //업로드 완료 후, 해당 파일에 접근할 수 있는 URL을 얻고 사용자가 이미지를 볼 수 있게 트윗 문서에 저장 [result의 public url을 반환하는 함수(string을 반환하는 promise)]
 
-        // updateDoc(document 참조, 업데이트 할 데이터)
+        //  업로드된 이미지의 URL을 현재 편집 중인 트윗 문서에 photo 필드로 추가 [updateDoc(document 참조, 업데이트 할 데이터)]
         await updateDoc(tweetRef, {
           photo: url,
         }); //tweet document에 이미지 url을 추가함
