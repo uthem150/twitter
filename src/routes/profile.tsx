@@ -1,8 +1,18 @@
 import styled from "styled-components";
-import { auth, storage } from "../firebase";
-import { useState } from "react";
+import { auth, db, storage } from "../firebase";
+import { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import { ITweet } from "../components/timeline";
+import Tweet from "../components/tweets";
 
 const Wrapper = styled.div`
   display: flex;
@@ -36,10 +46,20 @@ const Name = styled.span`
   font-size: 22px;
 `;
 
+const Tweets = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 10px;
+`;
+
 export default function Profile() {
   const user = auth.currentUser;
   //유저 이미지를 state로 만듦
-  const [avatar, setAvatar] = useState(user?.photoURL);
+  const [avatar, setAvatar] = useState(user?.photoURL); //사용자의 프로필 이미지 URL을 저장
+  const [tweets, setTweets] = useState<ITweet[]>([]); //사용자의 트윗 목록을 저장 - ITweet[] 타입의 초기 상태를, 빈 배열로 설정 (ITweet는 트윗 객체를 나타내는 타입(인터페이스))
+
+  //프로필 이미지를 변경할 때 호출되는 이벤트 핸들러
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (!user) return; //유저가 존재하지 않으면 return
@@ -56,6 +76,36 @@ export default function Profile() {
       });
     }
   };
+  const fetchTweets = async () => {
+    const tweetQuery = query(
+      collection(db, "tweets"), //어떤 컬렉션을 쿼리하고 싶은지 정의. (firestore 인스턴스를 매개변수로 넘겨야 함. 타겟은 tweets컬렉션)
+
+      //조건에 맞는 tweets만 가져오도록 필터링 (유저 ID가 현재 로그인된 유저 아이디와 같다면)
+      where("userId", "==", user?.uid), //트윗의 userId와 현재 유저의 id가 같은 트윗들
+      orderBy("createdAt", "desc"),
+      limit(25)
+    );
+    const snapshot = await getDocs(tweetQuery); //document를 가져옴
+
+    //가져온 문서들(snapshot.docs)에서 필요한 데이터를 추출하여, 각 트윗의 정보를 배열로 변환
+    const tweets = snapshot.docs.map((doc) => {
+      const { tweet, createdAt, userId, username, photo } = doc.data();
+      return {
+        tweet,
+        createdAt,
+        userId,
+        username,
+        photo,
+        id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음
+      };
+    });
+    setTweets(tweets); // 배열을 setTweets 함수를 통해 상태로 저장
+  };
+
+  //컴포넌트가 마운트될 때(처음 렌더링될 때) fetchTweets 함수를 호출하여 트윗들을 가져옴
+  useEffect(() => {
+    fetchTweets();
+  }, []); //[]는 의존성 배열 - 배열이 비어 있기 때문에, useEffect 내부의 코드는 컴포넌트가 처음 렌더링될 때한 번만 실행
 
   return (
     <Wrapper>
@@ -86,6 +136,13 @@ export default function Profile() {
         {user?.displayName ?? "Anonymous"}
         {/* {user?.displayName ? user.displayName : "Anonymous"} */}
       </Name>
+      <Tweets>
+        {/* tweets 배열을 .map() 함수로 순회하며, 각 tweet 객체를 <Tweet /> 컴포넌트로 변환 */}
+        {tweets.map((tweet) => (
+          // 각 tweet 객체의 모든 키-값 쌍이 <Tweet /> 컴포넌트의 props로 전달
+          <Tweet key={tweet.id} {...tweet} />
+        ))}
+      </Tweets>
     </Wrapper>
   );
 }
