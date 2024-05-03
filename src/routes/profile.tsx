@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweets";
+import EditNameForm from "../components/edit-name-form";
 
 const Wrapper = styled.div`
   display: flex;
@@ -53,11 +54,27 @@ const Tweets = styled.div`
   gap: 10px;
 `;
 
+const EditButton = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  width: 25px;
+`;
+
+const NameContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px; // 이름과 편집 버튼 사이의 간격 조정
+`;
+
 export default function Profile() {
   const user = auth.currentUser;
   //유저 이미지를 state로 만듦
   const [avatar, setAvatar] = useState(user?.photoURL); //사용자의 프로필 이미지 URL을 저장
   const [tweets, setTweets] = useState<ITweet[]>([]); //사용자의 트윗 목록을 저장 - ITweet[] 타입의 초기 상태를, 빈 배열로 설정 (ITweet는 트윗 객체를 나타내는 타입(인터페이스))
+  const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
 
   //프로필 이미지를 변경할 때 호출되는 이벤트 핸들러
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,6 +124,10 @@ export default function Profile() {
     fetchTweets();
   }, []); //[]는 의존성 배열 - 배열이 비어 있기 때문에, useEffect 내부의 코드는 컴포넌트가 처음 렌더링될 때한 번만 실행
 
+  const onEdit = () => {
+    setIsEditing(true); // 편집 모드 활성화
+  };
+
   return (
     <Wrapper>
       {/* 아이콘을 누르면 변경할 수 있도록, 숨겨져 있는 AvatarInput과 id로 연결시켜줌 */}
@@ -132,10 +153,31 @@ export default function Profile() {
         type="file"
         accept="img/*"
       />
-      <Name>
-        {user?.displayName ?? "Anonymous"}
-        {/* {user?.displayName ? user.displayName : "Anonymous"} */}
-      </Name>
+      <NameContainer>
+        <Name>{user?.displayName ?? "Anonymous"}</Name>
+        {isEditing ? null : (
+          <EditButton onClick={onEdit}>
+            <svg
+              data-slot="icon"
+              fill="none"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+              ></path>
+            </svg>
+          </EditButton>
+        )}
+      </NameContainer>
+      {isEditing ? (
+        <EditNameForm setIsEditing={setIsEditing}></EditNameForm>
+      ) : null}
       <Tweets>
         {/* tweets 배열을 .map() 함수로 순회하며, 각 tweet 객체를 <Tweet /> 컴포넌트로 변환 */}
         {tweets.map((tweet) => (
