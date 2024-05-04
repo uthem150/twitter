@@ -93,36 +93,40 @@ export default function Profile() {
       });
     }
   };
-  const fetchTweets = async () => {
-    const tweetQuery = query(
-      collection(db, "tweets"), //어떤 컬렉션을 쿼리하고 싶은지 정의. (firestore 인스턴스를 매개변수로 넘겨야 함. 타겟은 tweets컬렉션)
-
-      //조건에 맞는 tweets만 가져오도록 필터링 (유저 ID가 현재 로그인된 유저 아이디와 같다면)
-      where("userId", "==", user?.uid), //트윗의 userId와 현재 유저의 id가 같은 트윗들
-      orderBy("createdAt", "desc"),
-      limit(25)
-    );
-    const snapshot = await getDocs(tweetQuery); //document를 가져옴
-
-    //가져온 문서들(snapshot.docs)에서 필요한 데이터를 추출하여, 각 트윗의 정보를 배열로 변환
-    const tweets = snapshot.docs.map((doc) => {
-      const { tweet, createdAt, userId, username, photo } = doc.data();
-      return {
-        tweet,
-        createdAt,
-        userId,
-        username,
-        photo,
-        id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음
-      };
-    });
-    setTweets(tweets); // 배열을 setTweets 함수를 통해 상태로 저장
-  };
 
   //컴포넌트가 마운트될 때(처음 렌더링될 때) fetchTweets 함수를 호출하여 트윗들을 가져옴
   useEffect(() => {
-    fetchTweets();
-  }, []); //[]는 의존성 배열 - 배열이 비어 있기 때문에, useEffect 내부의 코드는 컴포넌트가 처음 렌더링될 때한 번만 실행
+    const fetchTweets = async () => {
+      const tweetQuery = query(
+        collection(db, "tweets"), //어떤 컬렉션을 쿼리하고 싶은지 정의. (firestore 인스턴스를 매개변수로 넘겨야 함. 타겟은 tweets컬렉션)
+
+        //조건에 맞는 tweets만 가져오도록 필터링 (유저 ID가 현재 로그인된 유저 아이디와 같다면)
+        where("userId", "==", user?.uid), //트윗의 userId와 현재 유저의 id가 같은 트윗들
+        orderBy("createdAt", "desc"),
+        limit(25)
+      );
+      const snapshot = await getDocs(tweetQuery); //document를 가져옴
+
+      //가져온 문서들(snapshot.docs)에서 필요한 데이터를 추출하여, 각 트윗의 정보를 배열로 변환
+      const tweets = snapshot.docs.map((doc) => {
+        const { tweet, createdAt, userId, username, photo } = doc.data();
+        return {
+          tweet,
+          createdAt,
+          userId,
+          username,
+          photo,
+          id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음
+        };
+      });
+      setTweets(tweets); // 배열을 setTweets 함수를 통해 상태로 저장
+    };
+
+    if (user?.uid) {
+      // user?.uid가 존재할 때만 fetchTweets를 호출
+      fetchTweets();
+    }
+  }, [user?.uid]); //[]는 의존성 배열 - 배열이 비어 있기 때문에, useEffect 내부의 코드는 컴포넌트가 처음 렌더링될 때한 번만 실행
 
   const onEdit = () => {
     setIsEditing(true); // 편집 모드 활성화
