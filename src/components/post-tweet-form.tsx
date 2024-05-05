@@ -70,14 +70,14 @@ export default function PostTweetForm() {
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTweet(e.target.value);
   };
-  // 업로드 이미지 최대 용량 지정 - 3MB
-  const maxSize = 3 * 1024 * 1024;
+  // 업로드 이미지 최대 용량 지정 - 2MB
+  const maxSize = 2 * 1024 * 1024;
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //타입이 file인 input이 변경될 때 마다, 파일이 배열을 받게 됨 (어떤 input은 복수의 파일을 업로드하게 하기 때문)
     const { files } = e.target;
     // 파일 업로드 용량제한 설정
     if (files && files[0].size > maxSize) {
-      alert("업로드 이미지 최대 크기는 3MB입니다");
+      alert("업로드 이미지 최대 크기는 2MB입니다");
       return;
     }
     //유저가 1개의 파일만 업로드 가능하도록 설정 (e.target에 file이 존재하고, 그 배열 길이가 1이면 배열의 첫번째 파일을 file state에 저장)
