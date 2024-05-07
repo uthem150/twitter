@@ -28,6 +28,23 @@ export default function CreateAccount() {
   });
   const navigate = useNavigate();
 
+  type ErrorCodes = {
+    [key: string]: string;
+  };
+
+  // 에러 메시지 객체에 대한 타입을 ErrorCodes로 설정
+  const errorMessages: ErrorCodes = {
+    "auth/email-already-in-use": "이미 가입이 되어있는 이메일입니다.",
+    "auth/invalid-email": "올바르지 않은 이메일 형식입니다.",
+    "auth/weak-password": "비밀번호를 최소 6글자 이상 입력해주세요.",
+    "auth/wrong-password": "이메일이나 비밀번호가 틀립니다.",
+    "auth/too-many-requests":
+      "로그인 시도가 여러 번 실패하여 이 계정에 대한 액세스가 일시적으로 비활성화되었습니다. 비밀번호를 재설정하여 즉시 복원하거나 나중에 다시 시도할 수 있습니다.",
+    "auth/user-not-found": "가입된 아이디를 찾을 수 없습니다.",
+    "auth/account-exists-with-different-credential":
+      "동일한 이메일로 가입된 계정이 존재합니다.",
+  };
+
   // e는 변경 이벤트 객체이며, React.ChangeEvent<HTMLInputElement> 타입
   // (TypeScript 타입 어노테이션. e가 React의 입력 변경 이벤트 객체임을 명시, 이벤트가 HTML의 <input> 요소와 관련 있음을 나타냄)
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +77,9 @@ export default function CreateAccount() {
     } catch (e) {
       //setError
       if (e instanceof FirebaseError) {
-        setError(e.message);
+        const errorMessage =
+          errorMessages[e.code] || "알 수 없는 에러가 발생했습니다.";
+        setError(errorMessage);
       }
     } finally {
       setLoading(false);
@@ -68,8 +87,11 @@ export default function CreateAccount() {
   };
 
   // 에러 처리를 위한 콜백 함수
-  const handleSocialLoginError = (errorMessage: string) => {
+  const handleSocialLoginError = (errorMsg: string) => {
+    const errorMessage =
+      errorMessages[errorMsg] || "알 수 없는 에러가 발생했습니다.";
     setError(errorMessage);
+    setLoading(false);
   };
 
   return (
