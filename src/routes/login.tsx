@@ -12,6 +12,7 @@ import {
   Wrapper,
 } from "../components/auth-components";
 import GithubButton from "../components/github-btn";
+import GoogleButton from "../components/google-btn";
 
 export default function CreateAccount() {
   const [isLoading, setLoading] = useState(false);
@@ -56,6 +57,11 @@ export default function CreateAccount() {
     }
   };
 
+  // 에러 처리를 위한 콜백 함수
+  const handleSocialLoginError = (errorMessage: string) => {
+    setError(errorMessage);
+  };
+
   return (
     <Wrapper>
       <Title>Log into 𝕏</Title>
@@ -93,7 +99,8 @@ export default function CreateAccount() {
         <Link to="/create-account">Create one &rarr;</Link>{" "}
         {/*&rarr는 right arrow*/}
       </Switcher>
-      <GithubButton />
+      <GithubButton onError={handleSocialLoginError} />
+      <GoogleButton onError={handleSocialLoginError} />
     </Wrapper>
   );
 }
