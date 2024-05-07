@@ -40,7 +40,7 @@ export default function GithubButton({ onError }: GithubButtonProps) {
     } catch (error) {
       if (error instanceof FirebaseError) {
         // onError 콜백 함수를 사용하여 에러 메시지를 상위 컴포넌트로 전달
-        onError(error.message);
+        onError(error.code);
         console.error(error);
       }
     }

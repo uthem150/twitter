@@ -39,7 +39,7 @@ export default function GoogleButton({ onError }: GithubButtonProps) {
       navigate("/"); // 로그인이 잘 되었다면, home으로
     } catch (error) {
       if (error instanceof FirebaseError) {
-        onError(error.message);
+        onError(error.code);
         console.error(error);
       }
     }
