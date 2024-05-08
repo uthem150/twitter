@@ -13,6 +13,15 @@ import {
 } from "../components/auth-components";
 import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
+import styled from "styled-components";
+
+// 버튼들을 나란히 배치하기 위한 컨테이너 스타일
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: 10px; // 버튼 사이의 간격
+  margin-top: 20px; // 폼과의 간격
+  width: 100%;
+`;
 
 export default function CreateAccount() {
   const [isLoading, setLoading] = useState(false);
@@ -133,8 +142,10 @@ export default function CreateAccount() {
         Already have an account? <Link to="/login">log in &rarr;</Link>{" "}
         {/*&rarr는 right arrow*/}
       </Switcher>
-      <GithubButton onError={handleSocialLoginError} />
-      <GoogleButton onError={handleSocialLoginError} />
+      <ButtonsContainer>
+        <GithubButton onError={handleSocialLoginError} />
+        <GoogleButton onError={handleSocialLoginError} />
+      </ButtonsContainer>
     </Wrapper>
   );
 }

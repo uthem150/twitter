@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 
 const Button = styled.span`
-  margin-top: 50px;
+  margin-top: 30px;
   background-color: white;
   font-weight: 500;
   width: 100%;
@@ -13,6 +13,8 @@ const Button = styled.span`
   padding: 10px 20px;
   border-radius: 50px;
   border: 0;
+  //  border: 1px solid #ebebeb;
+  font-size: 12px;
   display: flex;
   gap: 5px;
   align-items: center;
@@ -22,6 +24,7 @@ const Button = styled.span`
 
 const Logo = styled.img`
   height: 25px;
+  padding-right: 5px;
 `;
 
 interface GithubButtonProps {
