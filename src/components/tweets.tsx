@@ -6,20 +6,22 @@ import { deleteObject, ref } from "firebase/storage";
 import { useState } from "react";
 import EditTweetForm from "./edit-tweet-form";
 
-const Wrapper = styled.div`
-  display: grid;
+const Wrapper = styled.li`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   width: 100%;
-  grid-template-columns: 3fr 1fr;
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 15px;
+  list-style: none; // li 요소 스타일 제거
 `;
 
 const Column = styled.div``;
 
 const Photo = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  max-height: 300px; //최대 높이 설정
   border-radius: 15px;
 `;
 
@@ -38,6 +40,11 @@ const DeleteButton = styled.div`
   justify-content: center;
   height: 25px;
   width: 25px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 10px; // 버튼 사이 간격
 `;
 
 const EditButton = styled(DeleteButton)``; // 스타일은 삭제 버튼과 동일
@@ -91,7 +98,7 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
         )}
         {/* user?.uid는 JavaScript의 Optional Chaining (?.) 연산자 -  user 객체가 null이거나 undefined가 아닐 경우에만 uid 속성에 접근(타입에러 방지) */}
         {user?.uid === userId ? (
-          <>
+          <ButtonContainer>
             <EditButton onClick={onEdit}>
               {isEditing ? null : (
                 // 수정(펜) 아이콘 SVG 코드
@@ -129,7 +136,7 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
                 ></path>
               </svg>
             </DeleteButton>
-          </>
+          </ButtonContainer>
         ) : null}
       </Column>
       {/* 사진이 있으면, 보여주고 아니면 null */}
