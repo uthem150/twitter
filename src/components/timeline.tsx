@@ -66,7 +66,7 @@ export default function Timeline() {
             userId,
             username,
             photo,
-            id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음
+            id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음 - 게시글의 id
           };
         });
         setTweet(tweets); //setTweet을 통해 추출한 트윗들을 상태에 저장(상태 업데이트)

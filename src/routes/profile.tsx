@@ -14,6 +14,7 @@ import {
 import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweets";
 import EditNameForm from "../components/edit-name-form";
+import { useParams } from "react-router-dom";
 
 const Wrapper = styled.div`
   display: flex;
@@ -70,25 +71,27 @@ const NameContainer = styled.div`
 `;
 
 export default function Profile() {
-  const user = auth.currentUser;
+  const currentUser = auth.currentUser;
   //유저 이미지를 state로 만듦
-  const [avatar, setAvatar] = useState(user?.photoURL); //사용자의 프로필 이미지 URL을 저장
+  const [avatar, setAvatar] = useState("");
   const [tweets, setTweets] = useState<ITweet[]>([]); //사용자의 트윗 목록을 저장 - ITweet[] 타입의 초기 상태를, 빈 배열로 설정 (ITweet는 트윗 객체를 나타내는 타입(인터페이스))
   const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
+
+  const { userId } = useParams(); //현재 URL의 파라미터를 가져올 때 사용하는 훅 (useParams를 사용하여 userId 파라미터 값 추출)
 
   //프로필 이미지를 변경할 때 호출되는 이벤트 핸들러
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
-    if (!user) return; //유저가 존재하지 않으면 return
+    if (!currentUser || currentUser.uid !== userId) return; //현재 로그인한 사용자가 아니거나, URL 파라미터로 받은 userId와 일치하지 않으면 return
     if (files && files.length === 1) {
       //파일 첨부는 1개만 가능
       const file = files[0];
-      const locationRef = ref(storage, `avatars/${user?.uid}`); //ref 함수를 사용하여 Firebase Storage 내에 저장될 파일의 위치 지정[firebase storage 인스턴스, avatars라는 폴더 안에 이미지 저장(파일명은 유저id) -> 새 이미지 업로드하면 덮어쓰기됨]
+      const locationRef = ref(storage, `avatars/${currentUser?.uid}`); //ref 함수를 사용하여 Firebase Storage 내에 저장될 파일의 위치 지정[firebase storage 인스턴스, avatars라는 폴더 안에 이미지 저장(파일명은 유저id) -> 새 이미지 업로드하면 덮어쓰기됨]
       const result = await uploadBytes(locationRef, file); //선택된 파일(file)을 Firebase Storage에 업로드
       const avatarUrl = await getDownloadURL(result.ref); //업로드된 파일에 접근할 수 있는 URL을 얻음
       setAvatar(avatarUrl); //첨부한 이미지로 바꿈
 
-      await updateProfile(user, {
+      await updateProfile(currentUser, {
         photoURL: avatarUrl,
       });
     }
@@ -101,7 +104,7 @@ export default function Profile() {
         collection(db, "tweets"), //어떤 컬렉션을 쿼리하고 싶은지 정의. (firestore 인스턴스를 매개변수로 넘겨야 함. 타겟은 tweets컬렉션)
 
         //조건에 맞는 tweets만 가져오도록 필터링 (유저 ID가 현재 로그인된 유저 아이디와 같다면)
-        where("userId", "==", user?.uid), //트윗의 userId와 현재 유저의 id가 같은 트윗들
+        where("userId", "==", userId), //트윗의 userId와 id가 같은 트윗들
         orderBy("createdAt", "desc"),
         limit(25)
       );
@@ -122,15 +125,37 @@ export default function Profile() {
       setTweets(tweets); // 배열을 setTweets 함수를 통해 상태로 저장
     };
 
-    if (user?.uid) {
-      // user?.uid가 존재할 때만 fetchTweets를 호출
+    if (currentUser?.uid) {
+      // currentUser.uid가 존재할 때만 fetchTweets를 호출
       fetchTweets();
     }
-  }, [user?.uid]); //[]는 의존성 배열 - 배열이 비어 있기 때문에, useEffect 내부의 코드는 컴포넌트가 처음 렌더링될 때한 번만 실행
+  }, [currentUser?.uid, userId]); // useEffect 내부에서 사용되는 모든 외부 변수 및 props는 의존성 배열에 포함되어야, 해당 변수들의 값이 변경될 때마다 useEffect가 다시 실행될 수 있음
 
   const onEdit = () => {
     setIsEditing(true); // 편집 모드 활성화
   };
+
+  useEffect(() => {
+    // 사용자의 트윗을 가져오는 로직과 별개로 사용자의 프로필 정보를 가져오는 로직을 추가
+    const fetchUserProfile = async () => {
+      if (!userId) {
+        setAvatar(""); // userId가 없으면 avatar 상태 초기화
+        return;
+      } // userId가 없다면 실행하지 않음
+      try {
+        const AvatarRef = ref(storage, `avatars/${userId}`);
+        const AvatarUrl = await getDownloadURL(AvatarRef); // 업로드된 파일에 접근할 수 있는 URL을 얻음
+        setAvatar(AvatarUrl); // 첨부한 이미지로 바꿈
+      } catch (error) {
+        console.log(error);
+        console.log("아바타 이미지가 존재하지 않습니다");
+        setAvatar(""); // 오류 발생 시 avatar 상태 초기화
+        return; // 파일이 없거나 다른 오류가 발생했을 때 함수를 종료
+      }
+    };
+
+    fetchUserProfile();
+  }, [userId]); // userId가 변경될 때마다 useEffect 내부의 로직을 다시 실행
 
   return (
     <Wrapper>
@@ -158,8 +183,9 @@ export default function Profile() {
         accept="img/*"
       />
       <NameContainer>
-        <Name>{user?.displayName ?? "Anonymous"}</Name>
-        {isEditing ? null : (
+        <Name>{currentUser?.displayName ?? "Anonymous"}</Name>
+        {/* 현재 로그인한 사용자가 있고 & 현재 로그인한 사용자의 uid가 URL 파라미터로 받은 userId와 일치하고 & 이름을 편집중이 아닐때 수정버튼 나타남*/}
+        {currentUser && currentUser.uid === userId && !isEditing && (
           <EditButton onClick={onEdit}>
             <svg
               data-slot="icon"

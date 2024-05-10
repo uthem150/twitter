@@ -30,7 +30,7 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "profile", // localhost/profile
+        path: "profile/:userId", // localhost/profile
         element: <Profile />,
       },
     ],
@@ -43,6 +43,10 @@ const router = createBrowserRouter([
   {
     path: "/create-account",
     element: <CreateAccount />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
   {
     path: "/reset-password",

@@ -1,6 +1,7 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { auth } from "../firebase";
+import { useEffect, useState } from "react";
 
 const Wrapper = styled.div`
   display: grid;
@@ -32,7 +33,7 @@ const MenuItem = styled.div`
     width: 30px;
     fill: white;
   }
-  &.logout {
+  &.log-out {
     //클래스명이 log-out인 MenuItem타겟
     border-color: tomato;
     svg {
@@ -47,6 +48,19 @@ const MenuItem = styled.div`
 
 export default function Layout() {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null); // userId 상태 관리(상태의 타입은 string 또는 null을 포함할 수 있는 타입)
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid); // 로그인한 사용자가 있으면 userId 설정
+      } else {
+        setUserId(null); // 로그인한 사용자가 없으면 userId를 null로 설정
+      }
+    });
+
+    return () => unsubscribe(); // 컴포넌트가 언마운트될 때 구독 해제
+  }, []);
   const onLogOut = async () => {
     const ok = confirm("Are you sure you want to log out?"); //확인을 누르면, ok 변수가 true가 됨
     if (ok === true) {
@@ -77,7 +91,7 @@ export default function Layout() {
           </MenuItem>
         </Link>
         {/* 프로필 연결 버튼 */}
-        <Link to="/profile">
+        <Link to={`/profile/${userId}`}>
           <MenuItem>
             <svg
               fill="currentColor"

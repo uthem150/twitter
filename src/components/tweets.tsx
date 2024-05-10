@@ -5,6 +5,7 @@ import { deleteDoc, doc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { useState } from "react";
 import EditTweetForm from "./edit-tweet-form";
+import { Link } from "react-router-dom";
 
 const Wrapper = styled.li`
   display: flex;
@@ -38,7 +39,11 @@ const Photo = styled.img`
   border-radius: 15px;
 `;
 
-const Username = styled.span``;
+const Username = styled(Link)`
+  // Username 컴포넌트를 styled(Link)로 변경합니다.
+  color: inherit; // Link의 기본 색상을 상속받도록 설정합니다.
+  text-decoration: none; // 밑줄 제거
+`;
 
 const Payload = styled.p`
   margin: 10px 0px;
@@ -102,7 +107,9 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
   return (
     <Wrapper>
       <Column>
-        <Username>{username}</Username>
+        {/* <Username>{username}</Username> */}
+        <Username to={`/profile/${userId}`}>{username}</Username>
+
         {/* user?.uid는 JavaScript의 Optional Chaining (?.) 연산자 -  user 객체가 null이거나 undefined가 아닐 경우에만 uid 속성에 접근(타입에러 방지) */}
         {user?.uid === userId ? (
           <ButtonContainer>
