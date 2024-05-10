@@ -39,6 +39,10 @@ const MenuItem = styled.div`
       fill: tomato;
     }
   }
+  transition: transform 0.3s ease; // 변환(크기, 위치 등)에 대해 0.3초 동안 부드럽게 변화
+  &:hover {
+    transform: scale(1.05); // 호버 시 버튼을 5% 확대
+  }
 `;
 
 export default function Layout() {

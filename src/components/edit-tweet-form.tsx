@@ -10,9 +10,12 @@ import {
 } from "firebase/storage";
 
 const Form = styled.form`
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
 `;
 
 const TextArea = styled.textarea`

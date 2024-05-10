@@ -17,11 +17,24 @@ const Wrapper = styled.li`
   list-style: none; // li 요소 스타일 제거
 `;
 
-const Column = styled.div``;
+const Column = styled.div`
+  display: flex;
+  flex-direction: row; /* 가로 방향으로 아이템 나열 */
+  align-items: center; /* 세로축 중앙 정렬 */
+  justify-content: space-between; /* 시작점과 끝점 사이에 요소들 배치 */
+  width: 100%;
+`;
+
+const ImageContainer = styled.div`
+  display: flex;
+  justify-content: center; /* 가로축 중앙 정렬 */
+  width: 100%;
+`;
 
 const Photo = styled.img`
-  width: 100%;
-  max-height: 300px; //최대 높이 설정
+  width: auto; // 원본 이미지 비율 유지
+  max-width: 100%; // 컨테이너 너비를 초과하지 않도록
+  max-height: 400px; //최대 높이 설정
   border-radius: 15px;
 `;
 
@@ -40,11 +53,15 @@ const DeleteButton = styled.div`
   justify-content: center;
   height: 25px;
   width: 25px;
+  transition: transform 0.3s ease; // 변환(크기, 위치 등)에 대해 0.3초 동안 부드럽게 변화
+  &:hover {
+    transform: scale(1.05); // 호버 시 버튼을 5% 확대
+  }
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: 10px; // 버튼 사이 간격
+  gap: 5px; // 버튼 사이 간격
 `;
 
 const EditButton = styled(DeleteButton)``; // 스타일은 삭제 버튼과 동일
@@ -74,7 +91,7 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
   };
 
   const onEdit = () => {
-    setIsEditing(true); // 편집 모드 활성화
+    setIsEditing(!isEditing); // 현재 상태의 반대로 설정
   };
 
   const onEditSuccess = (newTweet: string) => {
@@ -86,21 +103,28 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
     <Wrapper>
       <Column>
         <Username>{username}</Username>
-        {isEditing ? (
-          <EditTweetForm
-            value={editedTweet}
-            tweetId={id}
-            onEditSuccess={onEditSuccess}
-            photo={photo}
-          ></EditTweetForm>
-        ) : (
-          <Payload>{tweet}</Payload>
-        )}
         {/* user?.uid는 JavaScript의 Optional Chaining (?.) 연산자 -  user 객체가 null이거나 undefined가 아닐 경우에만 uid 속성에 접근(타입에러 방지) */}
         {user?.uid === userId ? (
           <ButtonContainer>
             <EditButton onClick={onEdit}>
-              {isEditing ? null : (
+              {isEditing ? (
+                // 취소 아이콘 SVG 코드
+                <svg
+                  data-slot="icon"
+                  fill="none"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              ) : (
                 // 수정(펜) 아이콘 SVG 코드
                 <svg
                   data-slot="icon"
@@ -139,11 +163,21 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
           </ButtonContainer>
         ) : null}
       </Column>
+      {isEditing ? (
+        <EditTweetForm
+          value={editedTweet}
+          tweetId={id}
+          onEditSuccess={onEditSuccess}
+          photo={photo}
+        ></EditTweetForm>
+      ) : (
+        <Payload>{tweet}</Payload>
+      )}
       {/* 사진이 있으면, 보여주고 아니면 null */}
       {photo ? (
-        <Column>
+        <ImageContainer>
           <Photo src={photo} />
-        </Column>
+        </ImageContainer>
       ) : null}
     </Wrapper>
   );
