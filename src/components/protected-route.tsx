@@ -15,7 +15,7 @@ export default function ProtectedRoute({
   useEffect(() => {
     //인증상태 변경을 감지
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      setUser(authUser); // 사용자가 로그인하거나 로그아웃할 때마다 이 함수가 호출되어 user 상태를 업데이트
+      setUser(authUser); // 사용자가 로그인하거나 로그아웃할 때마다 이 함수가 호출되어 user 상태를 업데이트
     });
     return () => {
       unsubscribe();
