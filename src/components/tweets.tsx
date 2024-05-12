@@ -2,8 +2,8 @@ import styled from "styled-components";
 import { ITweet } from "./timeline";
 import { auth, db, storage } from "../firebase";
 import { deleteDoc, doc } from "firebase/firestore";
-import { deleteObject, ref } from "firebase/storage";
-import { useState } from "react";
+import { deleteObject, getDownloadURL, ref } from "firebase/storage";
+import { useEffect, useState } from "react";
 import EditTweetForm from "./edit-tweet-form";
 import { Link } from "react-router-dom";
 
@@ -39,12 +39,6 @@ const Photo = styled.img`
   border-radius: 15px;
 `;
 
-const Username = styled(Link)`
-  // Username 컴포넌트를 styled(Link)로 변경합니다.
-  color: inherit; // Link의 기본 색상을 상속받도록 설정합니다.
-  text-decoration: none; // 밑줄 제거
-`;
-
 const Payload = styled.p`
   margin: 10px 0px;
   font-size: 18px;
@@ -71,10 +65,44 @@ const ButtonContainer = styled.div`
 
 const EditButton = styled(DeleteButton)``; // 스타일은 삭제 버튼과 동일
 
+const UserInfoContainer = styled.div`
+  display: flex;
+  gap: 5px; // 버튼 사이 간격
+  align-items: center;
+`;
+
+const Username = styled(Link)`
+  // Username 컴포넌트를 styled(Link)로 변경합니다.
+  color: inherit; // Link의 기본 색상을 상속받도록 설정합니다.
+  text-decoration: none; // 밑줄 제거
+`;
+
+const AvatarNonUpload = styled.label`
+  //유저 이미지가 없을 때는 background처럼 보이도록
+  width: 33px;
+  overflow: hidden;
+  height: 33px;
+  border-radius: 50%;
+  background-color: #1d9bf0;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  svg {
+    width: 27px;
+  }
+`;
+
+const AvatarImg = styled.img`
+  width: 100%;
+`;
+
 export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
   const user = auth.currentUser;
   const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
   const [editedTweet, setEditedTweet] = useState(tweet); //수정 후 텍스트
+  const [avatar, setAvatar] = useState(""); //프로필 이미지
 
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this tweet?");
@@ -104,12 +132,50 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
     setIsEditing(false); // 편집 모드 종료
   };
 
+  useEffect(() => {
+    // 사용자의 트윗을 가져오는 로직과 별개로 사용자의 프로필 정보를 가져오는 로직을 추가
+    const fetchUserProfile = async () => {
+      if (!userId) {
+        setAvatar(""); // userId가 없으면 avatar 상태 초기화
+        return;
+      } // userId가 없다면 실행하지 않음
+      try {
+        const AvatarRef = ref(storage, `avatars/${userId}`);
+        const AvatarUrl = await getDownloadURL(AvatarRef); // 업로드된 파일에 접근할 수 있는 URL을 얻음
+        setAvatar(AvatarUrl); // 첨부한 이미지로 바꿈
+      } catch (error) {
+        // console.log(error);
+        // console.log("아바타 이미지가 존재하지 않습니다");
+        setAvatar(""); // 오류 발생 시 avatar 상태 초기화
+        return; // 파일이 없거나 다른 오류가 발생했을 때 함수를 종료
+      }
+    };
+
+    fetchUserProfile();
+  }, [userId]); // userId가 변경될 때마다 useEffect 내부의 로직을 다시 실행
+
   return (
     <Wrapper>
       <Column>
-        {/* <Username>{username}</Username> */}
-        <Username to={`/profile/${userId}`}>{username}</Username>
-
+        <UserInfoContainer>
+          <AvatarNonUpload>
+            {/* 유저이미지 url을 가지고 있는지 확인하고, 있으면 넣고 없으면 svg */}
+            {avatar ? (
+              <AvatarImg src={avatar} />
+            ) : (
+              <svg
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
+              </svg>
+            )}
+          </AvatarNonUpload>
+          {/* <Username>{username}</Username> */}
+          <Username to={`/profile/${userId}`}>{username}</Username>
+        </UserInfoContainer>
         {/* user?.uid는 JavaScript의 Optional Chaining (?.) 연산자 -  user 객체가 null이거나 undefined가 아닐 경우에만 uid 속성에 접근(타입에러 방지) */}
         {user?.uid === userId ? (
           <ButtonContainer>

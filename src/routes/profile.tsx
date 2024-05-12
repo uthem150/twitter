@@ -149,8 +149,8 @@ export default function Profile() {
         const AvatarUrl = await getDownloadURL(AvatarRef); // 업로드된 파일에 접근할 수 있는 URL을 얻음
         setAvatar(AvatarUrl); // 첨부한 이미지로 바꿈
       } catch (error) {
-        console.log(error);
-        console.log("아바타 이미지가 존재하지 않습니다");
+        // console.log(error);
+        // console.log("아바타 이미지가 존재하지 않습니다");
         setAvatar(""); // 오류 발생 시 avatar 상태 초기화
         return; // 파일이 없거나 다른 오류가 발생했을 때 함수를 종료
       }
@@ -163,7 +163,6 @@ export default function Profile() {
     <Wrapper>
       {currentUser && currentUser.uid === userId ? (
         <>
-          {" "}
           {/* 아이콘을 누르면 변경할 수 있도록, 숨겨져 있는 AvatarInput과 id로 연결시켜줌 */}
           <AvatarUpload htmlFor="avatar">
             {/* 유저이미지 url을 가지고 있는지 확인하고, 있으면 넣고 없으면 svg */}
