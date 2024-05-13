@@ -152,7 +152,7 @@ export default function Profile() {
         const userRef = doc(db, "users", userId); //firestore database에 저장된 user항목에서 userId에 해당하는 값 찾음
         const docSnap = await getDoc(userRef);
         if (docSnap.exists()) {
-          setTargetUser(docSnap.data().targetName);
+          setTargetUser(docSnap.data().name);
         } else {
           // 문서가 없는 경우
           console.log("해당 문서가 존재하지 않습니다");
@@ -171,7 +171,7 @@ export default function Profile() {
     };
 
     fetchUserProfile();
-  }, [userId]); // userId가 변경될 때마다 useEffect 내부의 로직을 다시 실행
+  }, [userId, isEditing]); // userId, isEditing가 변경될 때마다 useEffect 내부의 로직을 다시 실행
 
   return (
     <Wrapper>

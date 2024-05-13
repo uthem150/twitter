@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import {
@@ -14,6 +14,7 @@ import {
 import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
 import styled from "styled-components";
+import { doc, setDoc } from "firebase/firestore";
 
 // 버튼들을 나란히 배치하기 위한 컨테이너 스타일
 const ButtonsContainer = styled.div`
@@ -78,8 +79,20 @@ export default function CreateAccount() {
         password
       ); //인증객체, email, pw필요
       console.log(credentials.user);
+
       //계정을 만든 뒤에, 사용자 이름 설정
       await updateProfile(credentials.user, { displayName: name });
+
+      // Firestore에 사용자 정보 추가
+      await setDoc(doc(db, "users", credentials.user.uid), {
+        name: name,
+        email: email,
+        createdAt: Date.now(),
+        follower: [],
+        following: [],
+        description: "",
+        bookmark: [],
+      });
 
       // redirect to the homepage
       navigate("/");

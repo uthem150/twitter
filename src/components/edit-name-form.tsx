@@ -102,7 +102,7 @@ export default function EditNameForm({ setIsEditing }: EditNameFormProps) {
 
       // Firestore에 사용자 정보 업데이트 (users 컬렉션 내에 사용자의 uid를 문서 ID로 사용)
       const userRef = doc(db, "users", user.uid); // 'users' 컬렉션 내에 해당 사용자의 UID를 문서 ID로 사용
-      await setDoc(userRef, { targetName: name }, { merge: true }); // merge: true 옵션을 통해 기존 문서에 데이터를 병합
+      await setDoc(userRef, { name: name }, { merge: true }); // merge: true 옵션을 통해 기존 문서에 데이터를 병합
 
       setIsEditing(false); // 편집 성공 후 콜백 호출
     } catch (e) {
@@ -121,7 +121,7 @@ export default function EditNameForm({ setIsEditing }: EditNameFormProps) {
 
   return (
     <Form onSubmit={onSubmit}>
-      <TextArea defaultValue={user?.displayName ?? ""} onChange={onChange} />
+      <TextArea defaultValue={name ?? ""} onChange={onChange} />
       <SubmitBtn
         type="submit"
         value={isLoading ? "Loading..." : "Change"}
