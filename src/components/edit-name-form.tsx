@@ -1,7 +1,8 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 const Form = styled.form`
   display: flex;
@@ -94,9 +95,14 @@ export default function EditNameForm({ setIsEditing }: EditNameFormProps) {
 
     try {
       setLoading(true);
+      // Firebase Authentication에서 사용자의 displayName 업데이트
       await updateProfile(user, {
         displayName: name,
       });
+
+      // Firestore에 사용자 정보 업데이트 (users 컬렉션 내에 사용자의 uid를 문서 ID로 사용)
+      const userRef = doc(db, "users", user.uid); // 'users' 컬렉션 내에 해당 사용자의 UID를 문서 ID로 사용
+      await setDoc(userRef, { targetName: name }, { merge: true }); // merge: true 옵션을 통해 기존 문서에 데이터를 병합
 
       setIsEditing(false); // 편집 성공 후 콜백 호출
     } catch (e) {

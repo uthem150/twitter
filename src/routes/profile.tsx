@@ -5,6 +5,8 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
 import {
   collection,
+  doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
@@ -74,6 +76,8 @@ const NameContainer = styled.div`
 
 export default function Profile() {
   const currentUser = auth.currentUser;
+  const [targetUser, setTargetUser] = useState("");
+
   //유저 이미지를 state로 만듦
   const [avatar, setAvatar] = useState("");
   const [tweets, setTweets] = useState<ITweet[]>([]); //사용자의 트윗 목록을 저장 - ITweet[] 타입의 초기 상태를, 빈 배열로 설정 (ITweet는 트윗 객체를 나타내는 타입(인터페이스))
@@ -145,6 +149,16 @@ export default function Profile() {
         return;
       } // userId가 없다면 실행하지 않음
       try {
+        const userRef = doc(db, "users", userId); //firestore database에 저장된 user항목에서 userId에 해당하는 값 찾음
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          setTargetUser(docSnap.data().targetName);
+        } else {
+          // 문서가 없는 경우
+          console.log("해당 문서가 존재하지 않습니다");
+          setTargetUser("");
+        }
+
         const AvatarRef = ref(storage, `avatars/${userId}`);
         const AvatarUrl = await getDownloadURL(AvatarRef); // 업로드된 파일에 접근할 수 있는 URL을 얻음
         setAvatar(AvatarUrl); // 첨부한 이미지로 바꿈
@@ -205,7 +219,7 @@ export default function Profile() {
         accept="img/*"
       />
       <NameContainer>
-        <Name>{currentUser?.displayName ?? "Anonymous"}</Name>
+        <Name>{targetUser ? targetUser : "Anonymous"}</Name>
         {/* 현재 로그인한 사용자가 있고 & 현재 로그인한 사용자의 uid가 URL 파라미터로 받은 userId와 일치하고 & 이름을 편집중이 아닐때 수정버튼 나타남*/}
         {currentUser && currentUser.uid === userId && !isEditing && (
           <EditButton onClick={onEdit}>
