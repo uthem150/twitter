@@ -8,7 +8,9 @@ const Wrapper = styled.div`
   gap: 20px;
   grid-template-columns: 1fr 10fr; //1:10 비율로 열의 너비 차지
   height: 100%;
-  padding: 50px 0px;
+  //padding: 50px 0px;
+  margin-top: 50px;
+  margin-bottom: 10px;
   width: 100%;
   max-width: 960px;
 `;

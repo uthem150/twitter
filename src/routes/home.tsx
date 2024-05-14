@@ -5,7 +5,7 @@ import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimati
 
 const Wrapper = styled.div`
   display: grid;
-  gap: 50px;
+  gap: 30px;
   overflow-y: scroll; //양식은 고정된 상태에서 내용을 스크롤
   grid-template-rows: 1fr 5fr;
 `;

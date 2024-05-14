@@ -24,7 +24,7 @@ const TextArea = styled.textarea`
   border-radius: 20px;
   font-size: 16px;
   color: white;
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.3);
   width: 100%;
   resize: none; //textarea 크기 조정기능 제거
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
