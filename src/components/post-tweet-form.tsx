@@ -86,7 +86,7 @@ export default function PostTweetForm() {
       //browser-image-compression으로 압축
       try {
         const options = {
-          maxSizeMB: 1, // 최대 파일 크기 (MB 단위)
+          maxSizeMB: 0.7, // 최대 파일 크기 (MB 단위)
           maxWidthOrHeight: 1920, // 이미지의 최대 너비 또는 높이
           useWebWorker: true, // Web Worker를 사용할 것인지 여부
         };
@@ -111,8 +111,9 @@ export default function PostTweetForm() {
         tweet, //내용
         createdAt: Date.now(), //트윗이 생성된 시간을 밀리세컨드 단위로 기록
         userId: user.uid, //나중에 삭제할 수 있도록, 트윗을 생성한 사용자 ID저장
-        like: [],
+        like: [], //userId배열
         comment: [], //comment는 {userId, 내용, 작성시간}의 배열
+        bookmark: [], //userId배열
       });
       //이미지가 첨부된다면 저장될 경로
       if (file) {
