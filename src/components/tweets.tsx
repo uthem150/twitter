@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { ITweet } from "./timeline";
 import { auth, db, storage } from "../firebase";
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref } from "firebase/storage";
 import { useEffect, useState } from "react";
 import EditTweetForm from "./edit-tweet-form";
@@ -16,6 +16,7 @@ const Wrapper = styled.li`
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 15px;
   list-style: none; // li 요소 스타일 제거
+  background-color: rgba(0, 0, 0, 0.5); //투명도 50%
 `;
 
 const Column = styled.div`
@@ -77,8 +78,7 @@ const Username = styled(Link)`
   text-decoration: none; // 밑줄 제거
 `;
 
-const AvatarNonUpload = styled.label`
-  //유저 이미지가 없을 때는 background처럼 보이도록
+const AvatarNonUpload = styled(Link)`
   width: 33px;
   overflow: hidden;
   height: 33px;
@@ -98,11 +98,12 @@ const AvatarImg = styled.img`
   width: 100%;
 `;
 
-export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
+export default function Tweet({ photo, tweet, userId, id }: ITweet) {
   const user = auth.currentUser;
   const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
   const [editedTweet, setEditedTweet] = useState(tweet); //수정 후 텍스트
   const [avatar, setAvatar] = useState(""); //프로필 이미지
+  const [targetUser, setTargetUser] = useState(""); //트윗의 작성자 이름
 
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this tweet?");
@@ -140,6 +141,16 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
         return;
       } // userId가 없다면 실행하지 않음
       try {
+        const userRef = doc(db, "users", userId); //firestore database에 저장된 user항목에서 userId에 해당하는 값 찾음
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          setTargetUser(docSnap.data().name);
+        } else {
+          // 문서가 없는 경우
+          console.log("해당 문서가 존재하지 않습니다");
+          setTargetUser("");
+        }
+
         const AvatarRef = ref(storage, `avatars/${userId}`);
         const AvatarUrl = await getDownloadURL(AvatarRef); // 업로드된 파일에 접근할 수 있는 URL을 얻음
         setAvatar(AvatarUrl); // 첨부한 이미지로 바꿈
@@ -158,13 +169,13 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
     <Wrapper>
       <Column>
         <UserInfoContainer>
-          <AvatarNonUpload>
+          <AvatarNonUpload to={`/profile/${userId}`}>
             {/* 유저이미지 url을 가지고 있는지 확인하고, 있으면 넣고 없으면 svg */}
             {avatar ? (
               <AvatarImg src={avatar} />
             ) : (
               <svg
-                fill="currentColor"
+                fill="white"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
@@ -174,7 +185,9 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
             )}
           </AvatarNonUpload>
           {/* <Username>{username}</Username> */}
-          <Username to={`/profile/${userId}`}>{username}</Username>
+          <Username to={`/profile/${userId}`}>
+            {targetUser ? targetUser : "Anonymous"}
+          </Username>
         </UserInfoContainer>
         {/* user?.uid는 JavaScript의 Optional Chaining (?.) 연산자 -  user 객체가 null이거나 undefined가 아닐 경우에만 uid 속성에 접근(타입에러 방지) */}
         {user?.uid === userId ? (

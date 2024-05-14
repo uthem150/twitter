@@ -16,7 +16,7 @@ const TextArea = styled.textarea`
   border-radius: 20px;
   font-size: 16px;
   color: white;
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.5); //투명도 50%
   width: 100%;
   resize: none; //textarea 크기 조정기능 제거
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -100,6 +100,8 @@ export default function PostTweetForm() {
         createdAt: Date.now(), //트윗이 생성된 시간을 밀리세컨드 단위로 기록
         username: user.displayName || "Anonymous", //이름 존재하지 않으면 Anonymous표시
         userId: user.uid, //나중에 삭제할 수 있도록, 트윗을 생성한 사용자 ID저장
+        like: [],
+        comment: [], //comment는 {userId, 내용, 작성시간}의 배열
       });
       //이미지가 첨부된다면 저장될 경로
       if (file) {

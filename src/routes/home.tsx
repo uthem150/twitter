@@ -15,7 +15,6 @@ export default function Home() {
     <>
       <Wrapper>
         <BackgroundAnimation />
-
         <PostTweetForm />
         <Timeline />
       </Wrapper>

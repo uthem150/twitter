@@ -15,6 +15,7 @@ import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
 import styled from "styled-components";
 import { doc, setDoc } from "firebase/firestore";
+import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";
 
 // 버튼들을 나란히 배치하기 위한 컨테이너 스타일
 const ButtonsContainer = styled.div`
@@ -117,48 +118,51 @@ export default function CreateAccount() {
   };
 
   return (
-    <Wrapper>
-      <Title>Join 𝕏</Title>
-      <Form onSubmit={onSubmit}>
-        <Input
-          onChange={onChange}
-          name="name"
-          value={userInfo.name} // userInfo 객체에서 값을 참조
-          placeholder="Name"
-          type="name"
-          required
-        />
-        <Input
-          onChange={onChange}
-          name="email"
-          value={userInfo.email} // userInfo 객체에서 값을 참조
-          placeholder="Email"
-          type="email"
-          required
-        />
-        <Input
-          onChange={onChange}
-          name="password"
-          value={userInfo.password} // userInfo 객체에서 값을 참조
-          placeholder="Password"
-          type="password"
-          required
-        />
-        <Input
-          type="submit"
-          value={isLoading ? "Loading..." : "Create Accout"}
-          disabled={isLoading} // isLoading이 true일 때 버튼을 비활성화
-        />
-      </Form>
-      {error !== "" ? <Error>{error}</Error> : null}
-      <Switcher>
-        Already have an account? <Link to="/login">log in &rarr;</Link>{" "}
-        {/*&rarr는 right arrow*/}
-      </Switcher>
-      <ButtonsContainer>
-        <GithubButton onError={handleSocialLoginError} />
-        <GoogleButton onError={handleSocialLoginError} />
-      </ButtonsContainer>
-    </Wrapper>
+    <>
+      <BackgroundAnimation />
+      <Wrapper>
+        <Title>Join 𝕏</Title>
+        <Form onSubmit={onSubmit}>
+          <Input
+            onChange={onChange}
+            name="name"
+            value={userInfo.name} // userInfo 객체에서 값을 참조
+            placeholder="Name"
+            type="name"
+            required
+          />
+          <Input
+            onChange={onChange}
+            name="email"
+            value={userInfo.email} // userInfo 객체에서 값을 참조
+            placeholder="Email"
+            type="email"
+            required
+          />
+          <Input
+            onChange={onChange}
+            name="password"
+            value={userInfo.password} // userInfo 객체에서 값을 참조
+            placeholder="Password"
+            type="password"
+            required
+          />
+          <Input
+            type="submit"
+            value={isLoading ? "Loading..." : "Create Accout"}
+            disabled={isLoading} // isLoading이 true일 때 버튼을 비활성화
+          />
+        </Form>
+        {error !== "" ? <Error>{error}</Error> : null}
+        <Switcher>
+          Already have an account? <Link to="/login">log in &rarr;</Link>{" "}
+          {/*&rarr는 right arrow*/}
+        </Switcher>
+        <ButtonsContainer>
+          <GithubButton onError={handleSocialLoginError} />
+          <GoogleButton onError={handleSocialLoginError} />
+        </ButtonsContainer>
+      </Wrapper>
+    </>
   );
 }

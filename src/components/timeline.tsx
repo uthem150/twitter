@@ -17,7 +17,6 @@ export interface ITweet {
   photo?: string; //사진은 필수가 아니므로 없을 수도 있음(선택적 속성)
   tweet: string;
   userId: string;
-  username: string;
   createdAt: number;
 }
 

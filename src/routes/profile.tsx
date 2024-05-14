@@ -17,6 +17,7 @@ import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweets";
 import EditNameForm from "../components/edit-name-form";
 import { useParams } from "react-router-dom";
+import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";
 
 const Wrapper = styled.div`
   display: flex;
@@ -174,12 +175,30 @@ export default function Profile() {
   }, [userId, isEditing]); // userId, isEditing가 변경될 때마다 useEffect 내부의 로직을 다시 실행
 
   return (
-    <Wrapper>
-      {currentUser && currentUser.uid === userId ? (
-        <>
-          {/* 아이콘을 누르면 변경할 수 있도록, 숨겨져 있는 AvatarInput과 id로 연결시켜줌 */}
-          <AvatarUpload htmlFor="avatar">
-            {/* 유저이미지 url을 가지고 있는지 확인하고, 있으면 넣고 없으면 svg */}
+    <>
+      <BackgroundAnimation />
+      <Wrapper>
+        {currentUser && currentUser.uid === userId ? (
+          <>
+            {/* 아이콘을 누르면 변경할 수 있도록, 숨겨져 있는 AvatarInput과 id로 연결시켜줌 */}
+            <AvatarUpload htmlFor="avatar">
+              {/* 유저이미지 url을 가지고 있는지 확인하고, 있으면 넣고 없으면 svg */}
+              {avatar ? (
+                <AvatarImg src={avatar} />
+              ) : (
+                <svg
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
+                </svg>
+              )}
+            </AvatarUpload>
+          </>
+        ) : (
+          <AvatarNonUpload>
             {avatar ? (
               <AvatarImg src={avatar} />
             ) : (
@@ -192,65 +211,50 @@ export default function Profile() {
                 <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
               </svg>
             )}
-          </AvatarUpload>
-        </>
-      ) : (
-        <AvatarNonUpload>
-          {avatar ? (
-            <AvatarImg src={avatar} />
-          ) : (
-            <svg
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
-            </svg>
-          )}
-        </AvatarNonUpload>
-      )}
-
-      {/* AvatarInput: 숨겨져 있는 태그 */}
-      <AvatarInput
-        onChange={onAvatarChange}
-        id="avatar"
-        type="file"
-        accept="img/*"
-      />
-      <NameContainer>
-        <Name>{targetUser ? targetUser : "Anonymous"}</Name>
-        {/* 현재 로그인한 사용자가 있고 & 현재 로그인한 사용자의 uid가 URL 파라미터로 받은 userId와 일치하고 & 이름을 편집중이 아닐때 수정버튼 나타남*/}
-        {currentUser && currentUser.uid === userId && !isEditing && (
-          <EditButton onClick={onEdit}>
-            <svg
-              data-slot="icon"
-              fill="none"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-              ></path>
-            </svg>
-          </EditButton>
+          </AvatarNonUpload>
         )}
-      </NameContainer>
-      {isEditing ? (
-        <EditNameForm setIsEditing={setIsEditing}></EditNameForm>
-      ) : null}
-      <Tweets>
-        {/* tweets 배열을 .map() 함수로 순회하며, 각 tweet 객체를 <Tweet /> 컴포넌트로 변환 */}
-        {tweets.map((tweet) => (
-          // 각 tweet 객체의 모든 키-값 쌍이 <Tweet /> 컴포넌트의 props로 전달
-          <Tweet key={tweet.id} {...tweet} />
-        ))}
-      </Tweets>
-    </Wrapper>
+
+        {/* AvatarInput: 숨겨져 있는 태그 */}
+        <AvatarInput
+          onChange={onAvatarChange}
+          id="avatar"
+          type="file"
+          accept="img/*"
+        />
+        <NameContainer>
+          <Name>{targetUser ? targetUser : "Anonymous"}</Name>
+          {/* 현재 로그인한 사용자가 있고 & 현재 로그인한 사용자의 uid가 URL 파라미터로 받은 userId와 일치하고 & 이름을 편집중이 아닐때 수정버튼 나타남*/}
+          {currentUser && currentUser.uid === userId && !isEditing && (
+            <EditButton onClick={onEdit}>
+              <svg
+                data-slot="icon"
+                fill="none"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                ></path>
+              </svg>
+            </EditButton>
+          )}
+        </NameContainer>
+        {isEditing ? (
+          <EditNameForm setIsEditing={setIsEditing}></EditNameForm>
+        ) : null}
+        <Tweets>
+          {/* tweets 배열을 .map() 함수로 순회하며, 각 tweet 객체를 <Tweet /> 컴포넌트로 변환 */}
+          {tweets.map((tweet) => (
+            // 각 tweet 객체의 모든 키-값 쌍이 <Tweet /> 컴포넌트의 props로 전달
+            <Tweet key={tweet.id} {...tweet} />
+          ))}
+        </Tweets>
+      </Wrapper>
+    </>
   );
 }
