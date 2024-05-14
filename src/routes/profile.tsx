@@ -119,13 +119,16 @@ export default function Profile() {
 
       //가져온 문서들(snapshot.docs)에서 필요한 데이터를 추출하여, 각 트윗의 정보를 배열로 변환
       const tweets = snapshot.docs.map((doc) => {
-        const { tweet, createdAt, userId, username, photo } = doc.data();
+        const { tweet, createdAt, userId, photo, like, comment, bookmark } =
+          doc.data();
         return {
           tweet,
           createdAt,
           userId,
-          username,
           photo,
+          like,
+          comment,
+          bookmark,
           id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음
         };
       });

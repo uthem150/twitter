@@ -11,6 +11,13 @@ import styled from "styled-components";
 import Tweet from "./tweets";
 import { Unsubscribe } from "firebase/auth"; //이벤트 리스너 해제 함수의 타입
 
+// comment 배열의 구조 정의
+interface IComment {
+  userId: string;
+  content: string;
+  createdAt: number;
+}
+
 //인터페이스를 사용하여 트윗 데이터의 구조를 타입스크립트로 정의
 export interface ITweet {
   id: string;
@@ -18,6 +25,9 @@ export interface ITweet {
   tweet: string;
   userId: string;
   createdAt: number;
+  like: string[]; //사용자 아이디가 들어있는 문자열 배열
+  comment: IComment[];
+  bookmark: string[];
 }
 
 const Wrapper = styled.div`
@@ -58,13 +68,16 @@ export default function Timeline() {
       unsubscribe = await onSnapshot(tweetsQuery, (snapshot) => {
         //쿼리 결과로 반환된 문서들(docs)을 순회하면서, 각 문서(doc)로부터 필요한 데이터를 추출하고 새로운 형태로 변환
         const tweets = snapshot.docs.map((doc) => {
-          const { tweet, createdAt, userId, username, photo } = doc.data();
+          const { tweet, createdAt, userId, photo, like, comment, bookmark } =
+            doc.data();
           return {
             tweet,
             createdAt,
             userId,
-            username,
             photo,
+            like,
+            comment,
+            bookmark,
             id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음 - 게시글의 id
           };
         });

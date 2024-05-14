@@ -43,7 +43,8 @@ const Photo = styled.img`
 const Payload = styled.p`
   margin: 10px 0px;
   font-size: 18px;
-  word-break: break-all; /* 모든 문자에서 줄바꿈을 허용 */
+  word-break: break-all; // 모든 문자에서 줄바꿈 허용
+  line-height: 1.5; // 줄간격
 `;
 
 const DeleteButton = styled.div`
@@ -70,10 +71,11 @@ const ActionContainer = styled.div`
   margin-top: 10px;
   gap: 5px; // 버튼 사이 간격
   justify-content: flex-start; //시작점 기준으로 요소들을 정렬
+  align-items: center;
 `;
 
-const LikeButton = styled(DeleteButton)``; // 스타일은 삭제 버튼과 동일
-const CommentButton = styled(DeleteButton)``; // 스타일은 삭제 버튼과 동일
+const LikeButton = styled(DeleteButton)``;
+const CommentButton = styled(DeleteButton)``;
 const BookmarkButton = styled(DeleteButton)`
   margin-left: auto; // 왼쪽 여백을 자동으로 설정하여 오른쪽 끝에 버튼을 배치
 `;
@@ -112,7 +114,20 @@ const AvatarImg = styled.img`
   width: 100%;
 `;
 
-export default function Tweet({ photo, tweet, userId, id }: ITweet) {
+const StatsContainer = styled.div`
+  font-size: 13px;
+  margin-right: 10px;
+`;
+
+export default function Tweet({
+  photo,
+  tweet,
+  userId,
+  id,
+  like = [], // like가 undefined일 경우 빈 배열로 초기화
+  comment = [],
+  bookmark = [],
+}: ITweet) {
   const user = auth.currentUser;
   const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
   const [editedTweet, setEditedTweet] = useState(tweet); //수정 후 텍스트
@@ -297,6 +312,9 @@ export default function Tweet({ photo, tweet, userId, id }: ITweet) {
             ></path>
           </svg>
         </LikeButton>
+        <StatsContainer>
+          {like.length > 0 ? `좋아요 ${like.length}개` : null}
+        </StatsContainer>
         <CommentButton>
           <svg
             data-slot="icon"
@@ -314,6 +332,9 @@ export default function Tweet({ photo, tweet, userId, id }: ITweet) {
             ></path>
           </svg>
         </CommentButton>
+        <StatsContainer>
+          {comment.length ? `댓글 ${comment.length}개` : null}
+        </StatsContainer>
         <BookmarkButton>
           <svg
             data-slot="icon"
