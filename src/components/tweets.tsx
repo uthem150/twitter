@@ -133,6 +133,7 @@ export default function Tweet({
   const [editedTweet, setEditedTweet] = useState(tweet); //수정 후 텍스트
   const [avatar, setAvatar] = useState(""); //프로필 이미지
   const [targetUser, setTargetUser] = useState(""); //트윗의 작성자 이름
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this tweet?");
@@ -193,6 +194,20 @@ export default function Tweet({
 
     fetchUserProfile();
   }, [userId]); // userId가 변경될 때마다 useEffect 내부의 로직을 다시 실행
+
+  // 컴포넌트가 마운트될 때, 북마크 상태를 확인
+  useEffect(() => {
+    const checkBookmark = async () => {
+      // Firestore에서 현재 사용자의 데이터를 찾습니다.
+      const userRef = doc(db, "users", userId);
+      const docSnap = await getDoc(userRef);
+      if (docSnap.exists()) {
+        const bookmark = docSnap.data().bookmark || [];
+        setIsBookmarked(bookmark.includes(id));
+      }
+    };
+    checkBookmark();
+  }, [userId, id]);
 
   return (
     <Wrapper>
@@ -338,7 +353,7 @@ export default function Tweet({
         <BookmarkButton>
           <svg
             data-slot="icon"
-            fill="none"
+            fill={isBookmarked ? "white" : "none"} // isBookmarked에 따라 fill 속성 변경
             stroke-width="1.5"
             stroke="currentColor"
             viewBox="0 0 24 24"
