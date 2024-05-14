@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import PostTweetForm from "../components/post-tweet-form";
 import Timeline from "../components/timeline";
+import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";
 
 const Wrapper = styled.div`
   display: grid;
@@ -11,9 +12,13 @@ const Wrapper = styled.div`
 
 export default function Home() {
   return (
-    <Wrapper>
-      <PostTweetForm />
-      <Timeline />
-    </Wrapper>
+    <>
+      <Wrapper>
+        <BackgroundAnimation />
+
+        <PostTweetForm />
+        <Timeline />
+      </Wrapper>
+    </>
   );
 }

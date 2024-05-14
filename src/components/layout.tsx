@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 const Wrapper = styled.div`
   display: grid;
   gap: 20px;
-  grid-template-columns: 1fr 4fr; //1:4 비율로 열의 너비 차지
+  grid-template-columns: 1fr 10fr; //1:10 비율로 열의 너비 차지
   height: 100%;
   padding: 50px 0px;
   width: 100%;

@@ -14,6 +14,7 @@ import {
 import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
 import styled from "styled-components";
+import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";
 
 // 버튼들을 나란히 배치하기 위한 컨테이너 스타일
 const ButtonsContainer = styled.div`
@@ -93,46 +94,49 @@ export default function CreateAccount() {
   };
 
   return (
-    <Wrapper>
-      <Title>Log into 𝕏</Title>
-      <Form onSubmit={onSubmit}>
-        <Input
-          onChange={onChange}
-          name="email"
-          value={userInfo.email}
-          placeholder="Email"
-          type="email"
-          required
-        />
-        <Input
-          onChange={onChange}
-          name="password"
-          value={userInfo.password}
-          placeholder="Password"
-          type="password"
-          required
-        />
-        <Input
-          type="submit"
-          value={isLoading ? "Loading..." : "Log in"}
-          disabled={isLoading} // isLoading이 true일 때 버튼을 비활성화
-        />
-      </Form>
-      {error !== "" ? <Error>{error}</Error> : null}
-      <Switcher>
-        Did you forget the password?{" "}
-        <Link to="/reset-password">Reset Password &rarr;</Link>{" "}
-        {/*&rarr는 right arrow*/}
-      </Switcher>
-      <Switcher>
-        Don't have an account?{" "}
-        <Link to="/create-account">Create one &rarr;</Link>{" "}
-        {/*&rarr는 right arrow*/}
-      </Switcher>
-      <ButtonsContainer>
-        <GithubButton onError={handleSocialLoginError} />
-        <GoogleButton onError={handleSocialLoginError} />
-      </ButtonsContainer>
-    </Wrapper>
+    <>
+      <BackgroundAnimation />
+      <Wrapper>
+        <Title>Log into 𝕏</Title>
+        <Form onSubmit={onSubmit}>
+          <Input
+            onChange={onChange}
+            name="email"
+            value={userInfo.email}
+            placeholder="Email"
+            type="email"
+            required
+          />
+          <Input
+            onChange={onChange}
+            name="password"
+            value={userInfo.password}
+            placeholder="Password"
+            type="password"
+            required
+          />
+          <Input
+            type="submit"
+            value={isLoading ? "Loading..." : "Log in"}
+            disabled={isLoading} // isLoading이 true일 때 버튼을 비활성화
+          />
+        </Form>
+        {error !== "" ? <Error>{error}</Error> : null}
+        <Switcher>
+          Did you forget the password?{" "}
+          <Link to="/reset-password">Reset Password &rarr;</Link>{" "}
+          {/*&rarr는 right arrow*/}
+        </Switcher>
+        <Switcher>
+          Don't have an account?{" "}
+          <Link to="/create-account">Create one &rarr;</Link>{" "}
+          {/*&rarr는 right arrow*/}
+        </Switcher>
+        <ButtonsContainer>
+          <GithubButton onError={handleSocialLoginError} />
+          <GoogleButton onError={handleSocialLoginError} />
+        </ButtonsContainer>
+      </Wrapper>
+    </>
   );
 }
