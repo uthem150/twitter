@@ -6,6 +6,7 @@ import { deleteObject, getDownloadURL, ref } from "firebase/storage";
 import { useEffect, useState } from "react";
 import EditTweetForm from "./edit-tweet-form";
 import { Link } from "react-router-dom";
+import BookmarkClick from "./bookmark-component";
 
 const Wrapper = styled.li`
   display: flex;
@@ -76,9 +77,9 @@ const ActionContainer = styled.div`
 
 const LikeButton = styled(DeleteButton)``;
 const CommentButton = styled(DeleteButton)``;
-const BookmarkButton = styled(DeleteButton)`
-  margin-left: auto; // 왼쪽 여백을 자동으로 설정하여 오른쪽 끝에 버튼을 배치
-`;
+// const BookmarkButton = styled(DeleteButton)`
+//   margin-left: auto; // 왼쪽 여백을 자동으로 설정하여 오른쪽 끝에 버튼을 배치
+// `;
 
 const EditButton = styled(DeleteButton)``; // 스타일은 삭제 버튼과 동일
 
@@ -133,7 +134,7 @@ export default function Tweet({
   const [editedTweet, setEditedTweet] = useState(tweet); //수정 후 텍스트
   const [avatar, setAvatar] = useState(""); //프로필 이미지
   const [targetUser, setTargetUser] = useState(""); //트윗의 작성자 이름
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  // const [isBookmarked, setIsBookmarked] = useState(false);
 
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this tweet?");
@@ -195,19 +196,19 @@ export default function Tweet({
     fetchUserProfile();
   }, [userId]); // userId가 변경될 때마다 useEffect 내부의 로직을 다시 실행
 
-  // 컴포넌트가 마운트될 때, 북마크 상태를 확인
-  useEffect(() => {
-    const checkBookmark = async () => {
-      // Firestore에서 현재 사용자의 데이터를 찾습니다.
-      const userRef = doc(db, "users", userId);
-      const docSnap = await getDoc(userRef);
-      if (docSnap.exists()) {
-        const bookmark = docSnap.data().bookmark || [];
-        setIsBookmarked(bookmark.includes(id));
-      }
-    };
-    checkBookmark();
-  }, [userId, id]);
+  // // 컴포넌트가 마운트될 때, 북마크 상태를 확인
+  // useEffect(() => {
+  //   const checkBookmark = async () => {
+  //     // Firestore에서 현재 사용자의 데이터를 찾습니다.
+  //     const userRef = doc(db, "users", userId);
+  //     const docSnap = await getDoc(userRef);
+  //     if (docSnap.exists()) {
+  //       const bookmark = docSnap.data().bookmark || [];
+  //       setIsBookmarked(bookmark.includes(id));
+  //     }
+  //   };
+  //   checkBookmark();
+  // }, [userId, id]);
 
   return (
     <Wrapper>
@@ -314,15 +315,15 @@ export default function Tweet({
           <svg
             data-slot="icon"
             fill="none"
-            stroke-width="1.5"
+            strokeWidth="1.5"
             stroke="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
             ></path>
           </svg>
@@ -334,15 +335,15 @@ export default function Tweet({
           <svg
             data-slot="icon"
             fill="none"
-            stroke-width="1.5"
+            strokeWidth="1.5"
             stroke="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
             ></path>
           </svg>
@@ -350,7 +351,10 @@ export default function Tweet({
         <StatsContainer>
           {comment.length ? `댓글 ${comment.length}개` : null}
         </StatsContainer>
-        <BookmarkButton>
+
+        <BookmarkClick userId={userId} tweetId={id}></BookmarkClick>
+
+        {/* <BookmarkButton>
           <svg
             data-slot="icon"
             fill={isBookmarked ? "white" : "none"} // isBookmarked에 따라 fill 속성 변경
@@ -366,7 +370,7 @@ export default function Tweet({
               d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
             ></path>
           </svg>
-        </BookmarkButton>
+        </BookmarkButton> */}
       </ActionContainer>
     </Wrapper>
   );
