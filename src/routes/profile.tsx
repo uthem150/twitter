@@ -14,7 +14,7 @@ import {
   where,
 } from "firebase/firestore";
 import { ITweet } from "../components/timeline";
-import Tweet from "../components/tweets";
+import Tweet from "../components/tweets-components/tweets";
 import EditNameForm from "../components/edit-name-form";
 import { useParams } from "react-router-dom";
 import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";

@@ -8,7 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import styled from "styled-components";
-import Tweet from "./tweets";
+import Tweet from "./tweets-components/tweets";
 import { Unsubscribe } from "firebase/auth"; //이벤트 리스너 해제 함수의 타입
 
 // comment 배열의 구조 정의
@@ -25,6 +25,7 @@ export interface ITweet {
   tweet: string;
   userId: string;
   createdAt: number;
+  updatedAt: number;
   comment: IComment[];
 }
 
@@ -49,31 +50,26 @@ export default function Timeline() {
         orderBy("createdAt", "desc"),
         limit(25) //처음 25개만 불러오도록 pagination설정
       );
-      // const snapshot = await getDocs(tweetsQuery); //getDocs 함수로 쿼리를 실행하여 문서들의 스냅샷을 가져옴
-      // const tweets = snapshot.docs.map((doc) => {
-      //   const { tweet, createdAt, userId, username, photo } = doc.data();
-      //   return {
-      //     tweet,
-      //     createdAt,
-      //     userId,
-      //     username,
-      //     photo,
-      //     id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음
-      //   };
-      // });
 
       //지정된 쿼리(tweetsQuery)에 해당하는 데이터가 변경될 때마다 자동으로 호출
       unsubscribe = await onSnapshot(tweetsQuery, (snapshot) => {
         //쿼리 결과로 반환된 문서들(docs)을 순회하면서, 각 문서(doc)로부터 필요한 데이터를 추출하고 새로운 형태로 변환
         const tweets = snapshot.docs.map((doc) => {
-          const { tweet, createdAt, userId, photo, like, comment, bookmark } =
-            doc.data();
+          const {
+            tweet,
+            createdAt,
+            updatedAt,
+            userId,
+            photo,
+            comment,
+            bookmark,
+          } = doc.data();
           return {
             tweet,
             createdAt,
+            updatedAt,
             userId,
             photo,
-            like,
             comment,
             bookmark,
             id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음 - 게시글의 id

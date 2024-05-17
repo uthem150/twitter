@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { auth, db, storage } from "../firebase";
+import { auth, db, storage } from "../../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import {
   deleteObject,
@@ -8,6 +8,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
+import imageCompression from "browser-image-compression";
 
 const Form = styled.form`
   width: 100%;
@@ -95,7 +96,7 @@ export default function EditTweetForm({
   const maxSize = 2 * 1024 * 1024;
 
   //파일 입력 필드의 값이 변경될 때 실행될 이벤트 핸들러 함수
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     //파일의 크기를 검사하고 조건에 맞는 파일만 상태에 저장
     const { files } = e.target;
     // 파일 업로드 용량제한 설정
@@ -105,7 +106,18 @@ export default function EditTweetForm({
     }
     //유저가 1개의 파일만 업로드 가능하도록 설정 (e.target에 file이 존재하고, 그 배열 길이가 1이면 배열의 첫번째 파일을 file state에 저장)
     if (files && files.length === 1) {
-      setFile(files[0]);
+      //browser-image-compression으로 압축
+      try {
+        const options = {
+          maxSizeMB: 0.7, // 최대 파일 크기 (MB 단위)
+          maxWidthOrHeight: 1920, // 이미지의 최대 너비 또는 높이
+          useWebWorker: true, // Web Worker를 사용할 것인지 여부
+        };
+        const compressedFile = await imageCompression(files[0], options); // 이미지 압축
+        setFile(compressedFile); // 압축된 파일을 상태에 저장
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 

@@ -1,13 +1,13 @@
 import styled from "styled-components";
-import { ITweet } from "./timeline";
-import { auth, db, storage } from "../firebase";
+import { ITweet } from "../timeline";
+import { auth, db, storage } from "../../firebase";
 import { deleteDoc, doc, getDoc } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref } from "firebase/storage";
 import { useEffect, useState } from "react";
 import EditTweetForm from "./edit-tweet-form";
 import { Link } from "react-router-dom";
-import BookmarkClick from "./bookmark-component";
-import LikeClick from "./like-component";
+import LikeClick from "../action-components/like-component";
+import PostTime from "./post-time-components";
 
 const Wrapper = styled.li`
   display: flex;
@@ -76,7 +76,6 @@ const ActionContainer = styled.div`
   align-items: center;
 `;
 
-const LikeButton = styled(DeleteButton)``;
 const CommentButton = styled(DeleteButton)``;
 // const BookmarkButton = styled(DeleteButton)`
 //   margin-left: auto; // 왼쪽 여백을 자동으로 설정하여 오른쪽 끝에 버튼을 배치
@@ -91,8 +90,8 @@ const UserInfoContainer = styled.div`
 `;
 
 const Username = styled(Link)`
-  // Username 컴포넌트를 styled(Link)로 변경합니다.
-  color: inherit; // Link의 기본 색상을 상속받도록 설정합니다.
+  // Username 컴포넌트를 styled(Link)로 변경
+  color: inherit; // Link의 기본 색상을 상속받도록 설정
   text-decoration: none; // 밑줄 제거
 `;
 
@@ -116,18 +115,7 @@ const AvatarImg = styled.img`
   width: 100%;
 `;
 
-const StatsContainer = styled.div`
-  font-size: 13px;
-  margin-right: 10px;
-`;
-
-export default function Tweet({
-  photo,
-  tweet,
-  userId,
-  id,
-  comment = [],
-}: ITweet) {
+export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
   const user = auth.currentUser;
   const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
   const [editedTweet, setEditedTweet] = useState(tweet); //수정 후 텍스트
@@ -194,20 +182,6 @@ export default function Tweet({
     fetchUserProfile();
   }, [userId]); // userId가 변경될 때마다 useEffect 내부의 로직을 다시 실행
 
-  // // 컴포넌트가 마운트될 때, 북마크 상태를 확인
-  // useEffect(() => {
-  //   const checkBookmark = async () => {
-  //     // Firestore에서 현재 사용자의 데이터를 찾습니다.
-  //     const userRef = doc(db, "users", userId);
-  //     const docSnap = await getDoc(userRef);
-  //     if (docSnap.exists()) {
-  //       const bookmark = docSnap.data().bookmark || [];
-  //       setIsBookmarked(bookmark.includes(id));
-  //     }
-  //   };
-  //   checkBookmark();
-  // }, [userId, id]);
-
   return (
     <Wrapper>
       <Column>
@@ -231,6 +205,7 @@ export default function Tweet({
           <Username to={`/profile/${userId}`}>
             {targetUser ? targetUser : "Anonymous"}
           </Username>
+          <PostTime createdAt={createdAt}></PostTime>
         </UserInfoContainer>
         {/* user?.uid는 JavaScript의 Optional Chaining (?.) 연산자 -  user 객체가 null이거나 undefined가 아닐 경우에만 uid 속성에 접근(타입에러 방지) */}
         {user?.uid === userId ? (
@@ -309,23 +284,6 @@ export default function Tweet({
         </ImageContainer>
       ) : null}
       <ActionContainer>
-        {/* <LikeButton>
-          <svg
-            data-slot="icon"
-            fill="none"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-            ></path>
-          </svg>
-        </LikeButton> */}
         {user && <LikeClick userId={user.uid} tweetId={id}></LikeClick>}
         <CommentButton>
           <svg
@@ -344,12 +302,9 @@ export default function Tweet({
             ></path>
           </svg>
         </CommentButton>
-        <StatsContainer>
+        {/* <StatsContainer>
           {comment.length ? `댓글 ${comment.length}개` : null}
-        </StatsContainer>
-
-        {/* TypeScript는 user 객체가 null이면 오류 발생할 수 있음 */}
-        {user && <BookmarkClick userId={user.uid} tweetId={id}></BookmarkClick>}
+        </StatsContainer> */}
       </ActionContainer>
     </Wrapper>
   );
