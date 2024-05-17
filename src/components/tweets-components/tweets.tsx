@@ -1,13 +1,23 @@
 import styled from "styled-components";
 import { ITweet } from "../timeline";
 import { auth, db, storage } from "../../firebase";
-import { deleteDoc, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+} from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref } from "firebase/storage";
 import { useEffect, useState } from "react";
 import EditTweetForm from "./edit-tweet-form";
 import { Link } from "react-router-dom";
+import BookmarkClick from "../action-components/bookmark-component";
 import LikeClick from "../action-components/like-component";
 import PostTime from "./post-time-components";
+import CmtClick from "../action-components/comment-button-component.tsx";
+import CmtBoxForm from "../action-components/comment-box-component.tsx";
 
 const Wrapper = styled.li`
   display: flex;
@@ -76,11 +86,6 @@ const ActionContainer = styled.div`
   align-items: center;
 `;
 
-const CommentButton = styled(DeleteButton)``;
-// const BookmarkButton = styled(DeleteButton)`
-//   margin-left: auto; // 왼쪽 여백을 자동으로 설정하여 오른쪽 끝에 버튼을 배치
-// `;
-
 const EditButton = styled(DeleteButton)``; // 스타일은 삭제 버튼과 동일
 
 const UserInfoContainer = styled.div`
@@ -115,12 +120,30 @@ const AvatarImg = styled.img`
   width: 100%;
 `;
 
+const StatsContainer = styled.div`
+  font-size: 13px;
+  margin-right: 10px;
+`;
+
 export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
   const user = auth.currentUser;
   const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
   const [editedTweet, setEditedTweet] = useState(tweet); //수정 후 텍스트
   const [avatar, setAvatar] = useState(""); //프로필 이미지
   const [targetUser, setTargetUser] = useState(""); //트윗의 작성자 이름
+
+  const [cmtClicked, setCmtClicked] = useState(false); // 댓글 버튼 눌렸는지 상태 확인
+  const [cmtCount, setCmtCount] = useState(0); // 댓글 개수를 위한 상태
+
+  // comment컴포넌트에서 받은 cmt버튼이 클릭 되었는지 여부를 관리하는 함수
+  const handleCmtClicked = (returnValue: boolean) => {
+    setCmtClicked(returnValue);
+  };
+
+  // comment box에서 submit이 성공하면, 댓글 수 수동으로 증가 (불필요한 fetch 방지)
+  const handleCmtSubmitted = (status: boolean) => {
+    if (status) setCmtCount(cmtCount + 1);
+  };
 
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this tweet?");
@@ -182,6 +205,22 @@ export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
     fetchUserProfile();
   }, [userId]); // userId가 변경될 때마다 useEffect 내부의 로직을 다시 실행
 
+  // 댓글 갯수를 가져옴.
+  useEffect(() => {
+    const fetchCmtCount = async () => {
+      try {
+        const cmtsCollectionRef = collection(db, `tweets/${id}/comments`);
+        const cmtsQuery = query(cmtsCollectionRef);
+        const querySnapshot = await getDocs(cmtsQuery);
+        setCmtCount(querySnapshot.docs.length); // 댓글 개수 설정
+      } catch (error) {
+        console.error("Error fetching comments: ", error);
+      }
+    };
+
+    fetchCmtCount();
+  }, [id, userId]); // tweetId와 userId가 변경될 때마다 이 useEffect를 다시 실행
+
   return (
     <Wrapper>
       <Column>
@@ -216,15 +255,15 @@ export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
                 <svg
                   data-slot="icon"
                   fill="none"
-                  stroke-width="1.5"
+                  strokeWidth="1.5"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     d="M6 18 18 6M6 6l12 12"
                   ></path>
                 </svg>
@@ -285,27 +324,28 @@ export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
       ) : null}
       <ActionContainer>
         {user && <LikeClick userId={user.uid} tweetId={id}></LikeClick>}
-        <CommentButton>
-          <svg
-            data-slot="icon"
-            fill="none"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
-            ></path>
-          </svg>
-        </CommentButton>
-        {/* <StatsContainer>
-          {comment.length ? `댓글 ${comment.length}개` : null}
-        </StatsContainer> */}
+        {user && (
+          <CmtClick
+            // userId={user.uid}
+            // tweetId={id}
+            handleCmtClicked={handleCmtClicked}
+          ></CmtClick>
+        )}
+        <StatsContainer>
+          {cmtCount > 0 ? `댓글 ${cmtCount}개` : null}
+        </StatsContainer>
+
+        {/* TypeScript는 user 객체가 null이면 오류 발생할 수 있음 */}
+        {user && <BookmarkClick userId={user.uid} tweetId={id}></BookmarkClick>}
       </ActionContainer>
+
+      {user && cmtClicked ? (
+        <CmtBoxForm
+          userId={user.uid}
+          tweetId={id}
+          handleCmtSubmitted={handleCmtSubmitted}
+        />
+      ) : null}
     </Wrapper>
   );
 }
