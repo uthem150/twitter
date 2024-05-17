@@ -25,9 +25,7 @@ export interface ITweet {
   tweet: string;
   userId: string;
   createdAt: number;
-  like: string[]; //사용자 아이디가 들어있는 문자열 배열
   comment: IComment[];
-  bookmark: string[];
 }
 
 const Wrapper = styled.div`

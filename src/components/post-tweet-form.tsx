@@ -111,9 +111,7 @@ export default function PostTweetForm() {
         tweet, //내용
         createdAt: Date.now(), //트윗이 생성된 시간을 밀리세컨드 단위로 기록
         userId: user.uid, //나중에 삭제할 수 있도록, 트윗을 생성한 사용자 ID저장
-        like: [], //userId배열
         comment: [], //comment는 {userId, 내용, 작성시간}의 배열
-        bookmark: [], //userId배열
       });
       //이미지가 첨부된다면 저장될 경로
       if (file) {

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import EditTweetForm from "./edit-tweet-form";
 import { Link } from "react-router-dom";
 import BookmarkClick from "./bookmark-component";
+import LikeClick from "./like-component";
 
 const Wrapper = styled.li`
   display: flex;
@@ -125,16 +126,13 @@ export default function Tweet({
   tweet,
   userId,
   id,
-  like = [], // like가 undefined일 경우 빈 배열로 초기화
   comment = [],
-  bookmark = [],
 }: ITweet) {
   const user = auth.currentUser;
   const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
   const [editedTweet, setEditedTweet] = useState(tweet); //수정 후 텍스트
   const [avatar, setAvatar] = useState(""); //프로필 이미지
   const [targetUser, setTargetUser] = useState(""); //트윗의 작성자 이름
-  // const [isBookmarked, setIsBookmarked] = useState(false);
 
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this tweet?");
@@ -311,7 +309,7 @@ export default function Tweet({
         </ImageContainer>
       ) : null}
       <ActionContainer>
-        <LikeButton>
+        {/* <LikeButton>
           <svg
             data-slot="icon"
             fill="none"
@@ -327,10 +325,8 @@ export default function Tweet({
               d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
             ></path>
           </svg>
-        </LikeButton>
-        <StatsContainer>
-          {like.length > 0 ? `좋아요 ${like.length}개` : null}
-        </StatsContainer>
+        </LikeButton> */}
+        {user && <LikeClick userId={user.uid} tweetId={id}></LikeClick>}
         <CommentButton>
           <svg
             data-slot="icon"
@@ -352,25 +348,8 @@ export default function Tweet({
           {comment.length ? `댓글 ${comment.length}개` : null}
         </StatsContainer>
 
-        <BookmarkClick userId={userId} tweetId={id}></BookmarkClick>
-
-        {/* <BookmarkButton>
-          <svg
-            data-slot="icon"
-            fill={isBookmarked ? "white" : "none"} // isBookmarked에 따라 fill 속성 변경
-            stroke-width="1.5"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
-            ></path>
-          </svg>
-        </BookmarkButton> */}
+        {/* TypeScript는 user 객체가 null이면 오류 발생할 수 있음 */}
+        {user && <BookmarkClick userId={user.uid} tweetId={id}></BookmarkClick>}
       </ActionContainer>
     </Wrapper>
   );
