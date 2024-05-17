@@ -23,31 +23,31 @@ interface BookmarkClickProps {
 }
 
 export default function BookmarkClick({ userId, tweetId }: BookmarkClickProps) {
-  // 북마크 상태를 관리합니다. (예를 들어, 북마크가 되어있는지 여부를 표시)
+  // 북마크 상태를 관리 (예를 들어, 북마크가 되어있는지 여부를 표시)
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  // 북마크 버튼이 클릭되었을 때 실행될 함수입니다.
+  // 북마크 버튼이 클릭되었을 때 실행될 함수
   const onClick = async () => {
     try {
-      // Firestore에서 현재 사용자의 데이터를 찾습니다.
+      // Firestore에서 현재 사용자의 데이터를 찾음
       const userRef = doc(db, "users", userId);
       const docSnap = await getDoc(userRef);
 
       if (docSnap.exists()) {
-        // 사용자의 데이터에서 bookmark항목을 가져옵니다.
+        // 사용자의 데이터에서 bookmark항목을 가져옴
         let bookmarks = docSnap.data().bookmark || [];
-        // 현재 트윗의 id가 이미 bookmarks에 있는지 확인합니다.
+        // 현재 트윗의 id가 이미 bookmarks에 있는지 확인
         if (bookmarks.includes(tweetId)) {
-          // 이미 북마크가 되어있으면 제거합니다.
+          // 이미 북마크가 되어있으면 제거
           //bookmarks 배열의 각 요소(즉, 각 id)를 tweetId와 비교하여, tweetId와 같지 않은 모든 id들만을 새 배열로 모음
           bookmarks = bookmarks.filter((id: string) => id !== tweetId);
           setIsBookmarked(false);
         } else {
-          // 북마크에 추가합니다.
-          bookmarks.push(tweetId); // 북마크 배열에 트윗 ID를 추가합니다.
+          // 북마크에 추가
+          bookmarks.push(tweetId); // 북마크 배열에 트윗 ID를 추가
           setIsBookmarked(true);
         }
-        // 데이터베이스에 변경사항을 업데이트합니다.
+        // 데이터베이스에 변경사항을 업데이트
 
         await updateDoc(userRef, {
           bookmark: bookmarks,
@@ -61,7 +61,7 @@ export default function BookmarkClick({ userId, tweetId }: BookmarkClickProps) {
   // 컴포넌트가 마운트될 때, 북마크 상태를 확인
   useEffect(() => {
     const checkBookmark = async () => {
-      // Firestore에서 현재 사용자의 데이터를 찾습니다.
+      // Firestore에서 현재 사용자의 데이터를 찾음
       const userRef = doc(db, "users", userId);
       const docSnap = await getDoc(userRef);
       if (docSnap.exists()) {
