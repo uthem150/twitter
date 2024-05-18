@@ -1,7 +1,8 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { auth, db } from "../../firebase";
+import { auth, db } from "../../../firebase";
 import { addDoc, collection } from "firebase/firestore";
+import CmtTimeline from "./comment-timeline";
 
 const Form = styled.form`
   width: 100%;
@@ -50,6 +51,7 @@ interface CmtBoxFormProps {
   tweetId: string; // tweetId의 타입을 명시적으로 `string`으로 선언\
   userId: string;
   handleCmtSubmitted: (status: boolean) => void;
+  cmtClicked: boolean;
 }
 
 //props를 통해 초기값, 트윗 ID, 편집 성공 시 실행될 콜백 함수, 사진 URL을 받음
@@ -57,6 +59,7 @@ export default function CmtBoxForm({
   tweetId,
   userId,
   handleCmtSubmitted,
+  cmtClicked,
 }: CmtBoxFormProps) {
   const [isLoading, setLoading] = useState(false);
   const [cmt, setCmt] = useState(""); //작성한 댓글 내용
@@ -110,16 +113,22 @@ export default function CmtBoxForm({
   };
 
   return (
-    <Form onSubmit={onSubmit}>
-      <TextArea
-        required //필수로 내용은 있어야 submit가능
-        rows={2}
-        maxLength={200}
-        onChange={onChange}
-        value={cmt}
-        placeholder="댓글을 남기세요"
-      />
-      <SubmitBtn type="submit" value={isLoading ? "Loading..." : "댓글 작성"} />
-    </Form>
+    <>
+      <CmtTimeline tweetId={tweetId} cmtClicked={cmtClicked} />
+      <Form onSubmit={onSubmit}>
+        <TextArea
+          required //필수로 내용은 있어야 submit가능
+          rows={2}
+          maxLength={200}
+          onChange={onChange}
+          value={cmt}
+          placeholder="댓글을 남기세요"
+        />
+        <SubmitBtn
+          type="submit"
+          value={isLoading ? "Loading..." : "댓글 작성"}
+        />
+      </Form>
+    </>
   );
 }

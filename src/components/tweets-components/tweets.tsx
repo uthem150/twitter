@@ -16,8 +16,8 @@ import { Link } from "react-router-dom";
 import BookmarkClick from "../action-components/bookmark-component";
 import LikeClick from "../action-components/like-component";
 import PostTime from "./post-time-components";
-import CmtClick from "../action-components/comment-button-component.tsx";
-import CmtBoxForm from "../action-components/comment-box-component.tsx";
+import CmtClick from "../action-components/comment/comment-button.tsx";
+import CmtBoxForm from "../action-components/comment/comment-submitBox.tsx";
 
 const Wrapper = styled.li`
   display: flex;
@@ -344,6 +344,7 @@ export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
           userId={user.uid}
           tweetId={id}
           handleCmtSubmitted={handleCmtSubmitted}
+          cmtClicked={cmtClicked}
         />
       ) : null}
     </Wrapper>

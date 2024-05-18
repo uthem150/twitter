@@ -25,23 +25,23 @@ export default function CmtClick({
   // tweetId,
   handleCmtClicked,
 }: CmtClickProps) {
-  const [isCmtd, setIsCmtd] = useState(false);
+  const [isClicked, setIsClicked] = useState(false); //토글값 버튼이 눌렸으면 true, 꺼지면 false
   // const [cmtCount, setCmtCount] = useState(0);
 
   // 댓글 버튼이 클릭되었을 때 실행될 함수
   const onClick = async () => {
-    setIsCmtd(!isCmtd);
+    setIsClicked(!isClicked);
   };
   useEffect(() => {
-    // isCmtd 상태가 변경된 후 실행
-    handleCmtClicked(isCmtd);
-  }, [isCmtd, handleCmtClicked]);
+    // isClicked 상태가 변경된 후 실행
+    handleCmtClicked(isClicked);
+  }, [isClicked, handleCmtClicked]);
 
   return (
     <CmtButton onClick={onClick}>
       <svg
         data-slot="icon"
-        fill={isCmtd ? "white" : "none"} // isCmtd에 따라 fill 속성 변경
+        fill={isClicked ? "white" : "none"} // isClicked에 따라 fill 속성 변경
         strokeWidth="1.5"
         stroke="currentColor"
         viewBox="0 0 24 24"
