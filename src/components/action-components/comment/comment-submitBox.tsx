@@ -101,6 +101,7 @@ export default function CmtBoxForm({
       //   return;
       // }
 
+      // comment box에서 submit이 성공하면, 댓글 수 수동으로 증가하도록, 삭제 값 전달 (불필요한 fetch 방지)
       handleCmtSubmitted(true);
       console.log("Comment added successfully.");
       setCmt(""); // 댓글 작성 후 입력 필드 비우기

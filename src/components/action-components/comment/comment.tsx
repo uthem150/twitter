@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { auth, db, storage } from "../../../firebase.ts";
-import { doc, getDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -80,22 +80,48 @@ const AvatarImg = styled.img`
   width: 100%;
 `;
 
-export default function Comment({ createdAt, userId, content }: IComment) {
-  //   const user = auth.currentUser;
+const DeleteButton = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  width: 25px;
+  transition: transform 0.3s ease; // 변환(크기, 위치 등)에 대해 0.3초 동안 부드럽게 변화
+  &:hover {
+    transform: scale(1.05); // 호버 시 버튼을 5% 확대
+  }
+`;
+
+export default function Comment({
+  id,
+  createdAt,
+  userId,
+  content,
+  tweetId,
+}: IComment) {
+  const user = auth.currentUser;
   const [avatar, setAvatar] = useState(""); //프로필 이미지
   const [targetUser, setTargetUser] = useState(""); //트윗의 작성자 이름
+  const [isLoading, setLoading] = useState(false);
 
-  //   const onDelete = async () => {
-  //     const ok = confirm("Are you sure you want to delete this tweet?");
-  //     if (!ok || user?.uid !== userId) return; //userId가 일치하지 않으면 종료
-  //     try {
-  //       await deleteDoc(doc(db, "tweets", id)); //deleteDoc함수를 사용하여 문서 삭제
-  //     } catch (e) {
-  //       console.log(e);
-  //     } finally {
-  //       //
-  //     }
-  //   };
+  const onDelete = async () => {
+    const ok = confirm("Are you sure you want to delete this comment?");
+    if (!user || isLoading || !ok || user?.uid !== userId) return; //userId 일치하지 않으면 종료
+    try {
+      setLoading(true);
+
+      const commentDocRef = doc(db, `tweets/${tweetId}/comments/${id}`);
+      await deleteDoc(commentDocRef);
+      // deleteDoc의 매개변수는 삭제할 문서에 대한 참조. doc함수를 사용하여 해당 참조 불러옴
+      //firebase 인스턴스 db넘겨주고, 문서가 저장된 경로 제공(tweets 컬렉션에 저장되어 있음), 해당 문서는 id를 가짐
+    } catch (e) {
+      console.error("Error removing comment: ", e);
+    } finally {
+      console.log("Comment removed successfully.");
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // 사용자의 트윗을 가져오는 로직과 별개로 사용자의 프로필 정보를 가져오는 로직을 추가
@@ -154,6 +180,26 @@ export default function Comment({ createdAt, userId, content }: IComment) {
           </Username>
           <PostTime createdAt={createdAt}></PostTime>
         </UserInfoContainer>
+
+        {user?.uid === userId ? (
+          <DeleteButton onClick={onDelete}>
+            <svg
+              data-slot="icon"
+              fill="none"
+              strokeWidth="1.5"
+              stroke="tomato"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </DeleteButton>
+        ) : null}
       </Column>
 
       <Payload>{content}</Payload>

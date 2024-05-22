@@ -17,6 +17,7 @@ export interface IComment {
   userId: string;
   content: string;
   createdAt: number;
+  tweetId: string;
 }
 
 const Wrapper = styled.div`
@@ -58,6 +59,7 @@ export default function CmtTimeline({ tweetId, cmtClicked }: CmtTimelineProps) {
             userId,
             content,
             id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음 - 게시글의 id
+            tweetId: tweetId,
           };
         });
         setCmt(comments); //setCmt을 통해 추출한 댓글들을 상태에 저장(상태 업데이트)
@@ -74,7 +76,7 @@ export default function CmtTimeline({ tweetId, cmtClicked }: CmtTimelineProps) {
   return (
     <Wrapper>
       {Cmts.map((comment) => (
-        <Comment key={comment.id} {...comment} /> //React가 목록의 각 요소를 유일하게 식별할 수 있도록 key={comment.id}
+        <Comment key={comment.id} {...comment} tweetId={tweetId} /> //React가 목록의 각 요소를 유일하게 식별할 수 있도록 key={comment.id}
         //{...tweet}으로 트윗 객체의 모든 속성을 Tweet 컴포넌트에 prop으로 전달
       ))}
     </Wrapper>
