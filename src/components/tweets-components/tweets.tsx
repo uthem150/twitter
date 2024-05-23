@@ -141,8 +141,13 @@ export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
   };
 
   // comment box에서 submit이 성공하면, 댓글 수 수동으로 증가 (불필요한 fetch 방지)
-  const handleCmtSubmitted = (status: boolean) => {
+  const handleAddCmt = (status: boolean) => {
     if (status) setCmtCount(cmtCount + 1);
+  };
+
+  // comment-timeline에서 삭제가 성공하면, 댓글 수 수동으로 감소 (불필요한 fetch 방지)
+  const handleSubstractCmt = (status: boolean) => {
+    if (status) setCmtCount(cmtCount - 1);
   };
 
   const onDelete = async () => {
@@ -343,7 +348,8 @@ export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
         <CmtBoxForm
           userId={user.uid}
           tweetId={id}
-          handleCmtSubmitted={handleCmtSubmitted}
+          handleAddCmt={handleAddCmt}
+          handleSubstractCmt={handleSubstractCmt}
           cmtClicked={cmtClicked}
         />
       ) : null}

@@ -50,7 +50,8 @@ const SubmitBtn = styled.input`
 interface CmtBoxFormProps {
   tweetId: string; // tweetId의 타입을 명시적으로 `string`으로 선언\
   userId: string;
-  handleCmtSubmitted: (status: boolean) => void;
+  handleAddCmt: (status: boolean) => void;
+  handleSubstractCmt: (status: boolean) => void;
   cmtClicked: boolean;
 }
 
@@ -58,7 +59,8 @@ interface CmtBoxFormProps {
 export default function CmtBoxForm({
   tweetId,
   userId,
-  handleCmtSubmitted,
+  handleAddCmt,
+  handleSubstractCmt,
   cmtClicked,
 }: CmtBoxFormProps) {
   const [isLoading, setLoading] = useState(false);
@@ -102,20 +104,24 @@ export default function CmtBoxForm({
       // }
 
       // comment box에서 submit이 성공하면, 댓글 수 수동으로 증가하도록, 삭제 값 전달 (불필요한 fetch 방지)
-      handleCmtSubmitted(true);
+      handleAddCmt(true);
       console.log("Comment added successfully.");
       setCmt(""); // 댓글 작성 후 입력 필드 비우기
     } catch (error) {
       console.error("Error adding/removing cmt: ", error);
     } finally {
       setLoading(false);
-      handleCmtSubmitted(false);
+      handleAddCmt(false);
     }
   };
 
   return (
     <>
-      <CmtTimeline tweetId={tweetId} cmtClicked={cmtClicked} />
+      <CmtTimeline
+        tweetId={tweetId}
+        cmtClicked={cmtClicked}
+        handleSubstractCmt={handleSubstractCmt}
+      />
       <Form onSubmit={onSubmit}>
         <TextArea
           required //필수로 내용은 있어야 submit가능

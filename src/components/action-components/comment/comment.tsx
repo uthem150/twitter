@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { auth, db, storage } from "../../../firebase.ts";
-import { deleteDoc, doc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -33,19 +33,6 @@ const Payload = styled.p`
   word-break: break-all; // 모든 문자에서 줄바꿈 허용
   line-height: 1.5; // 줄간격
 `;
-
-// const DeleteButton = styled.div`
-//   cursor: pointer;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   height: 25px;
-//   width: 25px;
-//   transition: transform 0.3s ease; // 변환(크기, 위치 등)에 대해 0.3초 동안 부드럽게 변화
-//   &:hover {
-//     transform: scale(1.05); // 호버 시 버튼을 5% 확대
-//   }
-// `;
 
 const UserInfoContainer = styled.div`
   display: flex;
@@ -94,34 +81,14 @@ const DeleteButton = styled.div`
 `;
 
 export default function Comment({
-  id,
   createdAt,
   userId,
   content,
-  tweetId,
+  onDelete,
 }: IComment) {
-  const user = auth.currentUser;
   const [avatar, setAvatar] = useState(""); //프로필 이미지
   const [targetUser, setTargetUser] = useState(""); //트윗의 작성자 이름
-  const [isLoading, setLoading] = useState(false);
-
-  const onDelete = async () => {
-    const ok = confirm("Are you sure you want to delete this comment?");
-    if (!user || isLoading || !ok || user?.uid !== userId) return; //userId 일치하지 않으면 종료
-    try {
-      setLoading(true);
-
-      const commentDocRef = doc(db, `tweets/${tweetId}/comments/${id}`);
-      await deleteDoc(commentDocRef);
-      // deleteDoc의 매개변수는 삭제할 문서에 대한 참조. doc함수를 사용하여 해당 참조 불러옴
-      //firebase 인스턴스 db넘겨주고, 문서가 저장된 경로 제공(tweets 컬렉션에 저장되어 있음), 해당 문서는 id를 가짐
-    } catch (e) {
-      console.error("Error removing comment: ", e);
-    } finally {
-      console.log("Comment removed successfully.");
-      setLoading(false);
-    }
-  };
+  const user = auth.currentUser;
 
   useEffect(() => {
     // 사용자의 트윗을 가져오는 로직과 별개로 사용자의 프로필 정보를 가져오는 로직을 추가

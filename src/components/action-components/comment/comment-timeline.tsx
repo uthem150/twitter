@@ -1,5 +1,7 @@
 import {
   collection,
+  deleteDoc,
+  doc,
   limit,
   onSnapshot,
   orderBy,
@@ -8,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Unsubscribe } from "firebase/auth"; //이벤트 리스너 해제 함수의 타입
-import { db } from "../../../firebase";
+import { auth, db } from "../../../firebase";
 import Comment from "./comment";
 
 //인터페이스를 사용하여 트윗 데이터의 구조를 타입스크립트로 정의
@@ -17,7 +19,7 @@ export interface IComment {
   userId: string;
   content: string;
   createdAt: number;
-  tweetId: string;
+  onDelete?: () => Promise<void>; // onDelete을 선택적 속성으로 변경
 }
 
 const Wrapper = styled.div`
@@ -32,10 +34,17 @@ const Wrapper = styled.div`
 interface CmtTimelineProps {
   tweetId: string;
   cmtClicked: boolean;
+  handleSubstractCmt: (status: boolean) => void;
 }
 
-export default function CmtTimeline({ tweetId, cmtClicked }: CmtTimelineProps) {
+export default function CmtTimeline({
+  tweetId,
+  cmtClicked,
+  handleSubstractCmt,
+}: CmtTimelineProps) {
   const [Cmts, setCmt] = useState<IComment[]>([]); //댓글 데이터를 저장할 상태 tweets 정의(트윗 배열이고, 기본 값은 빈 배열)
+  const user = auth.currentUser;
+  const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
     let unsubscribe: Unsubscribe | null = null; //타입은 Unsubscribe나 null(처음에는 null)
@@ -59,7 +68,6 @@ export default function CmtTimeline({ tweetId, cmtClicked }: CmtTimelineProps) {
             userId,
             content,
             id: doc.id, //id는 문서에 다른 필드처럼 저장되어 있지 않고, doc에 있음 - 게시글의 id
-            tweetId: tweetId,
           };
         });
         setCmt(comments); //setCmt을 통해 추출한 댓글들을 상태에 저장(상태 업데이트)
@@ -73,10 +81,34 @@ export default function CmtTimeline({ tweetId, cmtClicked }: CmtTimelineProps) {
     fetchTweets();
   }, [tweetId, cmtClicked]);
 
+  const onDelete = async (commentId: string, commentUserId: string) => {
+    const ok = confirm("Are you sure you want to delete this comment?");
+    if (!user || isLoading || !ok || user?.uid !== commentUserId) return; //userId 일치하지 않으면 종료
+    try {
+      setLoading(true);
+
+      const commentDocRef = doc(db, `tweets/${tweetId}/comments/${commentId}`);
+      await deleteDoc(commentDocRef);
+      // deleteDoc의 매개변수는 삭제할 문서에 대한 참조. doc함수를 사용하여 해당 참조 불러옴
+      //firebase 인스턴스 db넘겨주고, 문서가 저장된 경로 제공(tweets 컬렉션에 저장되어 있음), 해당 문서는 id를 가짐
+      handleSubstractCmt(true);
+    } catch (e) {
+      console.error("Error removing comment: ", e);
+    } finally {
+      console.log("Comment removed successfully.");
+      setLoading(false);
+      handleSubstractCmt(false);
+    }
+  };
+
   return (
     <Wrapper>
       {Cmts.map((comment) => (
-        <Comment key={comment.id} {...comment} tweetId={tweetId} /> //React가 목록의 각 요소를 유일하게 식별할 수 있도록 key={comment.id}
+        <Comment
+          key={comment.id}
+          {...comment}
+          onDelete={() => onDelete(comment.id, comment.userId)}
+        /> //React가 목록의 각 요소를 유일하게 식별할 수 있도록 key={comment.id}
         //{...tweet}으로 트윗 객체의 모든 속성을 Tweet 컴포넌트에 prop으로 전달
       ))}
     </Wrapper>
