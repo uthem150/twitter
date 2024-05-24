@@ -106,7 +106,7 @@ export default function Layout() {
           </MenuItem>
         </Link>
         {/* 북마크 목록 버튼 */}
-        <Link to={`/profile/${userId}`}>
+        <Link to={`/bookmark/${userId}`}>
           <MenuItem>
             <svg
               data-slot="icon"
