@@ -12,6 +12,7 @@ import { auth } from "./firebase";
 import ProtectedRoute from "./components/protected-route";
 import ResetPassword from "./routes/reset-password";
 import Bookmark from "./routes/bookmark";
+import PostTweet from "./routes/post-tweet";
 
 //애플리케이션의 라우트를 정의하는 배열을 생성 -  router : 페이지 간의 이동 기능을 제공
 const router = createBrowserRouter([
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: "", // localhost/
         element: <Home />,
+      },
+      {
+        path: "post", // localhost/post
+        element: <PostTweet />,
       },
       {
         path: "profile/:userId", // localhost/profile

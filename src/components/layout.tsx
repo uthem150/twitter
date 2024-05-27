@@ -93,7 +93,7 @@ export default function Layout() {
           </MenuItem>
         </Link>
         {/* tweet작성 버튼 */}
-        <Link to={`/bookmark/${userId}`}>
+        <Link to={`/post`}>
           <MenuItem>
             <svg
               data-slot="icon"
