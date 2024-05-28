@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { auth, db } from "../firebase";
 import { updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
 
 const Form = styled.form`
   display: flex;
@@ -67,7 +75,29 @@ export default function EditNameForm({ setIsEditing }: EditNameFormProps) {
   const user = auth.currentUser;
 
   const [isLoading, setLoading] = useState(false);
-  const [name, setName] = useState(user?.displayName || "");
+  const [name, setName] = useState("");
+
+  // users 컬렉션에 저장된 이름 정보 가져옴
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (user) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            setName(docSnap.data().name); // Firestore에서 가져온 이름으로 상태 업데이트
+          } else {
+            console.log("No such document!");
+          }
+        } catch (e) {
+          console.error("Error fetching user name: ", e);
+        }
+      }
+    };
+
+    fetchUserName();
+  }, [user]); // user가 바뀌면 이 effect를 다시 실행
 
   //텍스트 영역의 내용이 변경될 때 실행될 이벤트 핸들러 함수
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -95,6 +125,16 @@ export default function EditNameForm({ setIsEditing }: EditNameFormProps) {
 
     try {
       setLoading(true);
+
+      // 동일한 이름 있는지 확인
+      const q = query(collection(db, "users"), where("name", "==", name));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        alert("이미 사용 중인 이름입니다. 다른 이름을 선택해주세요.");
+        return;
+      }
+
       // Firebase Authentication에서 사용자의 displayName 업데이트
       await updateProfile(user, {
         displayName: name,

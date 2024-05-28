@@ -52,7 +52,8 @@ export default function GithubButton({ onError }: GithubButtonProps) {
       if (!docSnap.exists()) {
         // 사용자가 Firestore에 존재하지 않으면, 사용자 문서 생성
         await setDoc(userRef, {
-          name: user.email ? user.email.split("@")[0] : "Anonymous", // 이메일의 앞부분을 displayName으로 사용
+          // name: user.email ? user.email.split("@")[0] : "Anonymous", // 이메일의 앞부분을 displayName으로 사용
+          name: user.email, // 처음에 이름을 이메일로 설정 - 중복 이름 금지
           email: user.email,
           createdAt: Date.now(),
           follower: [],
