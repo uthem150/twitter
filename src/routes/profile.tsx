@@ -18,6 +18,7 @@ import Tweet from "../components/tweets-components/tweets";
 import EditNameForm from "../components/edit-name-form";
 import { useParams } from "react-router-dom";
 import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";
+import Follow from "../components/follow";
 
 const Wrapper = styled.div`
   display: flex;
@@ -259,6 +260,7 @@ export default function Profile() {
         {isEditing ? (
           <EditNameForm setIsEditing={setIsEditing}></EditNameForm>
         ) : null}
+        <Follow targetUserId={userId} />
         <Tweets>
           {/* tweets 배열을 .map() 함수로 순회하며, 각 tweet 객체를 <Tweet /> 컴포넌트로 변환 */}
           {tweets.map((tweet) => (
