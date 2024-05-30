@@ -13,6 +13,38 @@ import styled from "styled-components";
 import FollowingUserList from "./following-user-list";
 import FollowerUserList from "./follower-user-list";
 
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 7px 10px; //좌우 7, 상하10
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 5px;
+  gap: 10px;
+`;
+
+interface StatsContainerProps {
+  isActive: boolean;
+}
+
+const StatsContainer = styled.div<StatsContainerProps>`
+  font-size: 15px;
+  align-items: center;
+  /* background-color: rgba(255, 255, 255, 0.1); // 배경색 추가 */
+  border-radius: 8px;
+  padding: 10px;
+  transition: transform 0.3s ease; // 변환(크기, 위치 등)에 대해 0.3초 동안 부드럽게 변화
+  &:hover {
+    transform: scale(1.05); // 호버 시 버튼을 5% 확대
+  }
+  cursor: pointer;
+  background-color: ${({ isActive }) =>
+    isActive ? "rgba(255, 255, 255, 0.1)" : "transparent"};
+  border: 2px solid
+    ${({ isActive }) => (isActive ? "rgba(255, 255, 255, 0.1)" : "transparent")};
+`;
+
 const LikeButton = styled.div`
   cursor: pointer;
   display: flex;
@@ -26,11 +58,6 @@ const LikeButton = styled.div`
   }
 `;
 
-const StatsContainer = styled.div`
-  font-size: 13px;
-  margin-right: 10px;
-`;
-
 interface FollowProps {
   targetUserId?: string; //string 또는 undefined 속성
 }
@@ -39,6 +66,8 @@ export default function Follow({ targetUserId }: FollowProps) {
   const [isFollowed, setIsFollowed] = useState(false); // 팔로잉 상태를 관리 (예를 들어, 팔로잉이 되어있는지 여부 표시)
   const [followerCount, setFollowerCount] = useState(0); // 팔로워 수를 위한 상태
   const [followingCount, setFollowingCount] = useState(0); // 팔로워 수를 위한 상태
+  const [showFollowerList, setShowFollowerList] = useState(false); // 팔로워 목록 표시 여부
+  const [showFollowingList, setShowFollowingList] = useState(false); // 팔로잉 목록 표시 여부
 
   const currentUser = auth.currentUser;
 
@@ -103,6 +132,14 @@ export default function Follow({ targetUserId }: FollowProps) {
     }
   };
 
+  const toggleFollowerList = () => {
+    setShowFollowerList((prev) => !prev);
+  };
+
+  const toggleFollowingList = () => {
+    setShowFollowingList((prev) => !prev);
+  };
+
   // 컴포넌트가 마운트될 때, 팔로우 상태를 확인
   useEffect(() => {
     const checkIfFollowed = async () => {
@@ -143,30 +180,43 @@ export default function Follow({ targetUserId }: FollowProps) {
 
   return (
     <>
-      {currentUser?.uid !== targetUserId ? (
-        <LikeButton onClick={onClick}>
-          <svg
-            data-slot="icon"
-            fill={isFollowed ? "white" : "none"} // isFollowed에 따라 fill 속성 변경
-            strokeWidth="1.5"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15.553Z"
-            ></path>
-          </svg>
-        </LikeButton>
-      ) : null}
+      <Wrapper>
+        {currentUser?.uid !== targetUserId ? (
+          <LikeButton onClick={onClick}>
+            <svg
+              data-slot="icon"
+              fill={isFollowed ? "white" : "none"} // isFollowed에 따라 fill 속성 변경
+              strokeWidth="1.5"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15.553Z"
+              ></path>
+            </svg>
+          </LikeButton>
+        ) : null}
+        <StatsContainer
+          onClick={toggleFollowerList}
+          isActive={showFollowerList}
+        >{`follower ${followerCount}`}</StatsContainer>
+        <StatsContainer
+          onClick={toggleFollowingList}
+          isActive={showFollowingList}
+        >{`following ${followingCount}`}</StatsContainer>
+      </Wrapper>
 
-      <StatsContainer>{`follower ${followerCount}`}</StatsContainer>
-      <StatsContainer>{`following ${followingCount}`}</StatsContainer>
-      {targetUserId && <FollowerUserList targetUserId={targetUserId} />}
-      {targetUserId && <FollowingUserList targetUserId={targetUserId} />}
+      {/* 팔로워/팔로잉 리스트 */}
+      {showFollowerList && targetUserId && (
+        <FollowerUserList targetUserId={targetUserId} />
+      )}
+      {showFollowingList && targetUserId && (
+        <FollowingUserList targetUserId={targetUserId} />
+      )}
     </>
   );
 }

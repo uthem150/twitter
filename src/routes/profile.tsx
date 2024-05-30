@@ -263,6 +263,7 @@ export default function Profile() {
         {isEditing ? (
           <EditNameForm setIsEditing={setIsEditing}></EditNameForm>
         ) : null}
+        {/* 팔로잉 및 팔로워 정보 */}
         <Follow targetUserId={userId} />
         <TweetWrapper>
           {/* tweets 배열을 .map() 함수로 순회하며, 각 tweet 객체를 <Tweet /> 컴포넌트로 변환 */}
