@@ -18,7 +18,7 @@ import Tweet from "../components/tweets-components/tweets";
 import EditNameForm from "../components/edit-name-form";
 import { useParams } from "react-router-dom";
 import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";
-import Follow from "../components/follow";
+import Follow from "../components/follow/follow";
 
 const Wrapper = styled.div`
   display: flex;
@@ -26,6 +26,16 @@ const Wrapper = styled.div`
   flex-direction: column;
   gap: 20px;
 `;
+
+const TweetWrapper = styled.div`
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  overflow-y: scroll;
+  width: 100%;
+  /* height: 80%; */
+`;
+
 const AvatarUpload = styled.label`
   //유저 이미지가 없을 때는 background처럼 보이도록
   width: 80px;
@@ -52,13 +62,6 @@ const AvatarInput = styled.input`
 `;
 const Name = styled.span`
   font-size: 22px;
-`;
-
-const Tweets = styled.div`
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  gap: 10px;
 `;
 
 const EditButton = styled.div`
@@ -261,13 +264,13 @@ export default function Profile() {
           <EditNameForm setIsEditing={setIsEditing}></EditNameForm>
         ) : null}
         <Follow targetUserId={userId} />
-        <Tweets>
+        <TweetWrapper>
           {/* tweets 배열을 .map() 함수로 순회하며, 각 tweet 객체를 <Tweet /> 컴포넌트로 변환 */}
           {tweets.map((tweet) => (
             // 각 tweet 객체의 모든 키-값 쌍이 <Tweet /> 컴포넌트의 props로 전달
             <Tweet key={tweet.id} {...tweet} />
           ))}
-        </Tweets>
+        </TweetWrapper>
       </Wrapper>
     </>
   );

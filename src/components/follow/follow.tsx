@@ -8,8 +8,10 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
+import { auth, db } from "../../firebase";
 import styled from "styled-components";
+import FollowingUserList from "./following-user-list";
+import FollowerUserList from "./follower-user-list";
 
 const LikeButton = styled.div`
   cursor: pointer;
@@ -163,6 +165,8 @@ export default function Follow({ targetUserId }: FollowProps) {
 
       <StatsContainer>{`follower ${followerCount}`}</StatsContainer>
       <StatsContainer>{`following ${followingCount}`}</StatsContainer>
+      {targetUserId && <FollowerUserList targetUserId={targetUserId} />}
+      {targetUserId && <FollowingUserList targetUserId={targetUserId} />}
     </>
   );
 }
