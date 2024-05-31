@@ -69,6 +69,12 @@ export default function Follow({ targetUserId }: FollowProps) {
   const [showFollowerList, setShowFollowerList] = useState(false); // 팔로워 목록 표시 여부
   const [showFollowingList, setShowFollowingList] = useState(false); // 팔로잉 목록 표시 여부
 
+  useEffect(() => {
+    // targetUserId가 변경될 때마다 두 state를 false로 설정
+    setShowFollowerList(false);
+    setShowFollowingList(false);
+  }, [targetUserId]);
+
   const currentUser = auth.currentUser;
 
   // 팔로우 버튼이 클릭되었을 때 실행될 함수
