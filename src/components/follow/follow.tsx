@@ -139,11 +139,13 @@ export default function Follow({ targetUserId }: FollowProps) {
   };
 
   const toggleFollowerList = () => {
-    setShowFollowerList((prev) => !prev);
+    setShowFollowerList((prev) => !prev); // 현재 상태를 반전
+    if (showFollowingList) setShowFollowingList(false); // 만약 다른 리스트가 보이고 있다면, 그 리스트를 숨김
   };
 
   const toggleFollowingList = () => {
-    setShowFollowingList((prev) => !prev);
+    setShowFollowingList((prev) => !prev); // 현재 상태를 반전
+    if (showFollowerList) setShowFollowerList(false); // 만약 다른 리스트가 보이고 있다면, 그 리스트를 숨김
   };
 
   // 컴포넌트가 마운트될 때, 팔로우 상태를 확인
