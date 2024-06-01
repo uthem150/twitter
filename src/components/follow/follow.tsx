@@ -25,7 +25,7 @@ const Wrapper = styled.div`
 `;
 
 interface StatsContainerProps {
-  isActive: boolean;
+  $isActive: boolean;
 }
 
 const StatsContainer = styled.div<StatsContainerProps>`
@@ -39,10 +39,11 @@ const StatsContainer = styled.div<StatsContainerProps>`
     transform: scale(1.05); // 호버 시 버튼을 5% 확대
   }
   cursor: pointer;
-  background-color: ${({ isActive }) =>
-    isActive ? "rgba(255, 255, 255, 0.1)" : "transparent"};
+  background-color: ${({ $isActive }) =>
+    $isActive ? "rgba(255, 255, 255, 0.1)" : "transparent"};
   border: 2px solid
-    ${({ isActive }) => (isActive ? "rgba(255, 255, 255, 0.1)" : "transparent")};
+    ${({ $isActive }) =>
+      $isActive ? "rgba(255, 255, 255, 0.1)" : "transparent"};
 `;
 
 const LikeButton = styled.div`
@@ -210,11 +211,11 @@ export default function Follow({ targetUserId }: FollowProps) {
         ) : null}
         <StatsContainer
           onClick={toggleFollowerList}
-          isActive={showFollowerList}
+          $isActive={showFollowerList}
         >{`follower ${followerCount}`}</StatsContainer>
         <StatsContainer
           onClick={toggleFollowingList}
-          isActive={showFollowingList}
+          $isActive={showFollowingList}
         >{`following ${followingCount}`}</StatsContainer>
       </Wrapper>
 
