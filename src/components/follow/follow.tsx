@@ -46,7 +46,7 @@ const StatsContainer = styled.div<StatsContainerProps>`
       $isActive ? "rgba(255, 255, 255, 0.1)" : "transparent"};
 `;
 
-const LikeButton = styled.div`
+const FollowButton = styled.div`
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -96,10 +96,9 @@ export default function Follow({ targetUserId }: FollowProps) {
       if (followDoc.exists()) {
         // '내 정보'가 팔로워 목록에 존재하면 삭제
         await deleteDoc(followDocRef);
-        console.log("following has been canceled - target");
+        console.log("상대 팔로워 목록에서 내가 삭제되었습니다");
         setIsFollowed(false); // 상태를 업데이트하여 UI에 반영
         setFollowerCount((prev) => prev - 1); // 팔로워 수 감소
-        return;
       } else {
         // '팔로우' 문서 생성 - 팔로우 한 사람의 정보 추가
         await setDoc(followDocRef, {
@@ -108,7 +107,7 @@ export default function Follow({ targetUserId }: FollowProps) {
         });
         setIsFollowed(true); // 상태를 업데이트하여 UI에 반영
         setFollowerCount((prev) => prev + 1); // 팔로워 수 증가
-        console.log("follow added successfully.");
+        console.log("상대 팔로워 목록에 내가 추가되었습니다.");
       }
     } catch (error) {
       console.error("Error adding/removing follow: ", error);
@@ -124,19 +123,19 @@ export default function Follow({ targetUserId }: FollowProps) {
       if (followDoc.exists()) {
         // '타겟 유저'가 팔로잉 목록에 존재하면 삭제
         await deleteDoc(followingDocRef);
-        console.log("following has been canceled - my");
-        return;
+        console.log("내 팔로잉 목록에서 타겟 유저가 삭제되었습니다");
       } else {
         // '팔로잉' 문서 생성 - 팔로잉 할 사람의 정보 추가
         await setDoc(followingDocRef, {
           userId: targetUserId,
           createdAt: Date.now(),
         });
-        console.log("follow added successfully.");
+        console.log("내 팔로잉 목록에 타겟 유저가 추가되었습니다");
       }
     } catch (error) {
       console.error("Error adding/removing follow: ", error);
     }
+    return;
   };
 
   const toggleFollowerList = () => {
@@ -191,7 +190,7 @@ export default function Follow({ targetUserId }: FollowProps) {
     <>
       <Wrapper>
         {currentUser?.uid !== targetUserId ? (
-          <LikeButton onClick={onClick}>
+          <FollowButton onClick={onClick}>
             <svg
               data-slot="icon"
               fill={isFollowed ? "white" : "none"} // isFollowed에 따라 fill 속성 변경
@@ -207,7 +206,7 @@ export default function Follow({ targetUserId }: FollowProps) {
                 d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15.553Z"
               ></path>
             </svg>
-          </LikeButton>
+          </FollowButton>
         ) : null}
         <StatsContainer
           onClick={toggleFollowerList}

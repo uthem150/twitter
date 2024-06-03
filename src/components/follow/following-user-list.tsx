@@ -1,5 +1,8 @@
 import {
   collection,
+  deleteDoc,
+  doc,
+  getDoc,
   limit,
   onSnapshot,
   orderBy,
@@ -9,7 +12,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Unsubscribe } from "firebase/auth"; //이벤트 리스너 해제 함수의 타입
 import FollowUser from "./follow-user";
-import { db } from "../../firebase";
+import { auth, db } from "../../firebase";
 
 //인터페이스를 사용하여 트윗 데이터의 구조를 타입스크립트로 정의
 export interface User {
@@ -32,6 +35,7 @@ export default function FollowingUserList({
   targetUserId: string;
 }) {
   const [Users, setUsers] = useState<User[]>([]); //팔로우 하는 유저들의 아이디를 담을 배열(기본 값은 빈 배열)
+  const currentUser = auth.currentUser;
 
   useEffect(() => {
     let unsubscribe: Unsubscribe | null = null; //타입은 Unsubscribe나 null(처음에는 null)
@@ -66,12 +70,60 @@ export default function FollowingUserList({
     fetchFollowings();
   }, [targetUserId]);
 
+  // 사용자를 팔로잉 목록에서 삭제하는 함수
+  const handleUnfollow = async ({ userId }: { userId: string }) => {
+    // 타겟 유저의 팔로워 목록에 내 정보 삭제
+    try {
+      // 상대의 팔로워 목록에서 내 정보 삭제하기 위한 문서 경로 생성
+      const followerPath = `users/${userId}/followers/${targetUserId}`;
+      const followerDocRef = doc(db, followerPath);
+      const followerDoc = await getDoc(followerDocRef);
+
+      if (followerDoc.exists()) {
+        // '내 정보'가 팔로우 목록에 존재하면 삭제
+        await deleteDoc(followerDocRef);
+        console.log("상대의 팔로워 목록에서, 내가 정상적으로 삭제되었습니다.");
+      }
+    } catch (error) {
+      console.error("상대의 팔로워 목록에서, 나 삭제 중 오류 발생:", error);
+    }
+
+    // 내 팔로잉 리스트에서 삭제
+    try {
+      const followingPath = `users/${targetUserId}/followings/${userId}`;
+      const followingDocRef = doc(db, followingPath);
+      const followingDoc = await getDoc(followingDocRef); // 타겟 유저가 팔로잉 목록에 있는지 확인
+
+      //내 프로필을 내가 보고 있을 때,
+      if (targetUserId == currentUser?.uid && followingDoc.exists()) {
+        await deleteDoc(followingDocRef);
+        console.log("팔로잉 목록에서 타겟유저가 삭제되었습니다.");
+        // 상태 업데이트
+        setUsers((prevUsers) =>
+          prevUsers.filter((user) => user.userId !== userId)
+        );
+      }
+    } catch (error) {
+      console.error("팔로잉 삭제 중 오류 발생:", error);
+    }
+    return;
+  };
+
   return (
     <Wrapper>
-      {Users.map((user) => (
-        <FollowUser key={user.userId} {...user} /> //React가 목록의 각 요소를 유일하게 식별할 수 있도록 key={user.id}
-        //{...tweet}으로 트윗 객체의 모든 속성을 Tweet 컴포넌트에 prop으로 전달
-      ))}
+      {Users.map(
+        (user) =>
+          currentUser && (
+            <div key={user.userId}>
+              <FollowUser key={user.userId} {...user} />
+              {targetUserId === currentUser?.uid && (
+                <button onClick={() => handleUnfollow({ userId: user.userId })}>
+                  팔로잉 취소
+                </button>
+              )}
+            </div>
+          )
+      )}
     </Wrapper>
   );
 }

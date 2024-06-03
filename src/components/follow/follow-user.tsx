@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  padding: 7px 10px; //좌우 7, 상하10
+  padding: 10px 13px; //상하10 좌우10
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 5px;
   list-style: none; // li 요소 스타일 제거
@@ -27,7 +27,7 @@ const Column = styled.div`
 
 const UserInfoContainer = styled.div`
   display: flex;
-  gap: 5px; // 버튼 사이 간격
+  gap: 10px; // 버튼 사이 간격
   align-items: center;
 `;
 
