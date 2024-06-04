@@ -217,13 +217,18 @@ export default function Follow({ targetUserId }: FollowProps) {
           $isActive={showFollowingList}
         >{`following ${followingCount}`}</StatsContainer>
       </Wrapper>
-
       {/* 팔로워/팔로잉 리스트 */}
       {showFollowerList && targetUserId && (
-        <FollowerUserList targetUserId={targetUserId} />
+        <FollowerUserList
+          targetUserId={targetUserId}
+          setFollowerCount={setFollowerCount}
+        />
       )}
       {showFollowingList && targetUserId && (
-        <FollowingUserList targetUserId={targetUserId} />
+        <FollowingUserList
+          targetUserId={targetUserId}
+          setFollowingCount={setFollowingCount}
+        />
       )}
     </>
   );

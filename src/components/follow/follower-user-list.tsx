@@ -31,8 +31,10 @@ const Wrapper = styled.div`
 
 export default function FollowerUserList({
   targetUserId,
+  setFollowerCount,
 }: {
   targetUserId: string;
+  setFollowerCount: (count: (prev: number) => number) => void;
 }) {
   const [Users, setUsers] = useState<User[]>([]); //팔로우 하는 유저들의 아이디를 담을 배열(기본 값은 빈 배열)
   const currentUser = auth.currentUser;
@@ -102,6 +104,7 @@ export default function FollowerUserList({
         setUsers((prevUsers) =>
           prevUsers.filter((user) => user.userId !== userId)
         );
+        setFollowerCount((prev) => prev - 1);
       }
     } catch (error) {
       console.error("팔로워 삭제 중 오류 발생:", error);
