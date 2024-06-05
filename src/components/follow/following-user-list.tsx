@@ -74,6 +74,11 @@ export default function FollowingUserList({
 
   // 사용자를 팔로잉 목록에서 삭제하는 함수
   const handleUnfollow = async ({ userId }: { userId: string }) => {
+    // 확인 대화 상자 표시
+    if (!window.confirm("정말 팔로잉을 취소하시겠습니까?")) {
+      return;
+    }
+
     // 타겟 유저의 팔로워 목록에 내 정보 삭제
     try {
       // 상대의 팔로워 목록에서 내 정보 삭제하기 위한 문서 경로 생성

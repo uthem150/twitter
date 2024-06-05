@@ -86,7 +86,7 @@ export default function PostTweetForm() {
       //browser-image-compression으로 압축
       try {
         const options = {
-          maxSizeMB: 0.7, // 최대 파일 크기 (MB 단위)
+          maxSizeMB: 0.5, // 최대 파일 크기 (MB 단위)
           maxWidthOrHeight: 1920, // 이미지의 최대 너비 또는 높이
           useWebWorker: true, // Web Worker를 사용할 것인지 여부
         };
