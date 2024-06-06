@@ -1,4 +1,4 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
@@ -55,7 +55,6 @@ const MenuItem = styled.div`
 `;
 
 export default function Layout() {
-  const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null); // userId 상태 관리(상태의 타입은 string 또는 null을 포함할 수 있는 타입)
 
   useEffect(() => {
@@ -69,14 +68,7 @@ export default function Layout() {
 
     return () => unsubscribe(); // 컴포넌트가 언마운트될 때 구독 해제
   }, []);
-  const onLogOut = async () => {
-    const ok = confirm("Are you sure you want to log out?"); //확인을 누르면, ok 변수가 true가 됨
-    if (ok === true) {
-      await auth.signOut(); //signOut함수 호출
-      //결과값을 반환하면, 로그인 페이지로 돌아감
-      navigate("/login");
-    }
-  };
+
   return (
     //navigation bar
     <Wrapper>
@@ -151,46 +143,6 @@ export default function Layout() {
             </svg>
           </MenuItem>
         </Link>
-        {/* 북마크 목록 버튼 */}
-        <Link to={`/bookmark/${userId}`}>
-          <MenuItem>
-            <svg
-              data-slot="icon"
-              fill="white"
-              strokeWidth="1.5"
-              stroke="white"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
-              ></path>
-            </svg>
-          </MenuItem>
-        </Link>
-        {/* 로그아웃 버튼 */}
-        <MenuItem onClick={onLogOut} className="log-out">
-          <svg
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              clipRule="evenodd"
-              fillRule="evenodd"
-              d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z"
-            />
-            <path
-              clipRule="evenodd"
-              fillRule="evenodd"
-              d="M19 10a.75.75 0 0 0-.75-.75H8.704l1.048-.943a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 1 0 1.004-1.114l-1.048-.943h9.546A.75.75 0 0 0 19 10Z"
-            />
-          </svg>
-        </MenuItem>
       </Menu>
       <Outlet />
       {/*중첩된 라우트(nested route)의 컴포넌트를 렌더링하는 위치 지정(자식 라우트가 렌더링될 자리를 표시)*/}

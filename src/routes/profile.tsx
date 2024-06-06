@@ -19,6 +19,7 @@ import EditNameForm from "../components/edit-name-form";
 import { useParams } from "react-router-dom";
 import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";
 import Follow from "../components/follow/follow";
+import AdditionalComponent from "../components/profile-additional-component";
 
 const Wrapper = styled.div`
   display: flex;
@@ -194,6 +195,7 @@ export default function Profile() {
     <>
       <BackgroundAnimation />
       <Wrapper>
+        <AdditionalComponent />
         {currentUser && currentUser.uid === userId ? (
           <>
             {/* 아이콘을 누르면 변경할 수 있도록, 숨겨져 있는 AvatarInput과 id로 연결시켜줌 */}
