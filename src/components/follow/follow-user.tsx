@@ -35,13 +35,13 @@ const Username = styled(Link)`
   // Username 컴포넌트를 styled(Link)로 변경
   color: inherit; // Link의 기본 색상을 상속받도록 설정
   text-decoration: none; // 밑줄 제거
-  font-size: 13px;
+  font-size: 14px;
 `;
 
 const AvatarNonUpload = styled(Link)`
-  width: 25px;
+  width: 27px;
+  height: 27px;
   overflow: hidden;
-  height: 25px;
   border-radius: 50%;
   background-color: #1d9bf0;
   margin-right: 5px;
@@ -50,7 +50,7 @@ const AvatarNonUpload = styled(Link)`
   align-items: center;
   cursor: pointer;
   svg {
-    width: 27px;
+    width: 24px;
   }
 `;
 

@@ -29,6 +29,33 @@ const Wrapper = styled.div`
   margin-top: 10px;
 `;
 
+const UserContainer = styled.div`
+  display: flex;
+  gap: 3px;
+  align-items: center;
+`;
+
+const FollowUserWrapper = styled.div`
+  flex: 10; // SubmitBtn과 FollowUser 차지하는 너비 설정
+`;
+
+const SubmitBtn = styled.button`
+  flex: 0.8;
+  height: 100%;
+  background-color: rgba(78, 78, 78, 0.5);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 10px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  //사용자가 버튼에 커서를 올리거나, 클릭했을 때 투명도 변경
+  &:hover,
+  &:active {
+    opacity: 0.9;
+  }
+`;
+
 export default function FollowingUserList({
   targetUserId,
   setFollowingCount,
@@ -122,14 +149,18 @@ export default function FollowingUserList({
       {Users.map(
         (user) =>
           currentUser && (
-            <div key={user.userId}>
-              <FollowUser key={user.userId} {...user} />
+            <UserContainer key={user.userId}>
+              <FollowUserWrapper>
+                <FollowUser key={user.userId} {...user} />
+              </FollowUserWrapper>
               {targetUserId === currentUser?.uid && (
-                <button onClick={() => handleUnfollow({ userId: user.userId })}>
-                  팔로잉 취소
-                </button>
+                <SubmitBtn
+                  onClick={() => handleUnfollow({ userId: user.userId })}
+                >
+                  delete
+                </SubmitBtn>
               )}
-            </div>
+            </UserContainer>
           )
       )}
     </Wrapper>
