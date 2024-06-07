@@ -195,9 +195,9 @@ export default function Profile() {
     <>
       <BackgroundAnimation />
       <Wrapper>
-        <AdditionalComponent />
         {currentUser && currentUser.uid === userId ? (
           <>
+            <AdditionalComponent />
             {/* 아이콘을 누르면 변경할 수 있도록, 숨겨져 있는 AvatarInput과 id로 연결시켜줌 */}
             <AvatarUpload htmlFor="avatar">
               {/* 유저이미지 url을 가지고 있는지 확인하고, 있으면 넣고 없으면 svg */}
