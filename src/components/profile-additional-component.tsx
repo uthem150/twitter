@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   background-color: rgba(0, 0, 0, 0.5); //투명도 50% */
 
   list-style: none; // li 요소 스타일 제거
-  gap: 5px;
+  gap: 3px;
 `;
 
 const MenuItem = styled.div`
@@ -22,21 +22,23 @@ const MenuItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
   height: 30px;
-  width: 30px;
-  border-radius: 50%;
+  width: 35px;
 
   svg {
-    width: 17px;
+    width: 23px;
     fill: white;
   }
   &.log-out {
     //클래스명이 log-out인 MenuItem타겟
-    border-color: tomato;
+    /* border-color: tomato; */
     svg {
       fill: tomato;
     }
+  }
+  &.hamberger {
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 7px;
   }
   transition: transform 0.3s ease; // 변환(크기, 위치 등)에 대해 0.3초 동안 부드럽게 변화
   &:hover {
@@ -46,20 +48,23 @@ const MenuItem = styled.div`
 const Text = styled.span`
   color: white;
   font-size: 14px;
-  text-decoration: none;
-  a {
-    text-decoration: none;
-  }
 `;
 
 const MenuWrapper = styled.div`
-  width: 140px;
+  width: 150px;
   gap: 10px;
   display: grid;
-  grid-template-columns: 1fr 7fr; //1:10 비율로 열의 너비 차지
+  grid-template-columns: 1fr 8fr; //1:10 비율로 열의 너비 차지
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  padding: 5px;
+  border-radius: 7px;
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
 `;
 
 export default function AdditionalComponent() {
@@ -94,7 +99,7 @@ export default function AdditionalComponent() {
 
   return (
     <Wrapper>
-      <MenuItem>
+      <MenuItem className="hamberger">
         <svg
           onClick={toggleMenu} // SVG 클릭 시 메뉴 표시 상태 토글
           data-slot="icon"
@@ -116,7 +121,7 @@ export default function AdditionalComponent() {
       {isMenuVisible && ( // 메뉴 표시 상태에 따라 조건부 렌더링
         <>
           {/* 북마크 목록 버튼 */}
-          <Link to={`/bookmark/${userId}`}>
+          <StyledLink to={`/bookmark/${userId}`}>
             <MenuWrapper>
               <MenuItem>
                 <svg
@@ -137,7 +142,7 @@ export default function AdditionalComponent() {
               </MenuItem>
               <Text>북마크 게시글</Text>
             </MenuWrapper>
-          </Link>
+          </StyledLink>
           <MenuWrapper>
             {/* 로그아웃 버튼 */}
             <MenuItem onClick={onLogOut} className="log-out">
