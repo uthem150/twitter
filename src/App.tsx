@@ -14,6 +14,7 @@ import ResetPassword from "./routes/reset-password";
 import Bookmark from "./routes/bookmark";
 import PostTweet from "./routes/post-tweet";
 import Search from "./routes/search";
+import FollowingUserPost from "./routes/following-user-post";
 
 //애플리케이션의 라우트를 정의하는 배열을 생성 -  router : 페이지 간의 이동 기능을 제공
 const router = createBrowserRouter([
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "", // localhost/
         element: <Home />,
+      },
+      {
+        path: "following/:userId", // localhost/following
+        element: <FollowingUserPost />,
       },
       {
         path: "post", // localhost/post
