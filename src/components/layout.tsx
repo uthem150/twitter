@@ -91,7 +91,7 @@ export default function Layout() {
           </MenuItem>
         </Link>
         {/* 팔로잉하는 사람들 게시글 목록 연결 버튼 */}
-        <Link to={`/following/${userId}`}>
+        <Link to={`/following`}>
           <MenuItem>
             <svg
               data-slot="icon"

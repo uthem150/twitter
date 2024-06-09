@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { auth } from "../firebase";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const Wrapper = styled.div`
   display: flex;
@@ -69,20 +69,8 @@ const StyledLink = styled(Link)`
 
 export default function AdditionalComponent() {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState<string | null>(null); // userId 상태 관리(상태의 타입은 string 또는 null을 포함할 수 있는 타입)
   const [isMenuVisible, setIsMenuVisible] = useState(false); // 메뉴 표시 상태 추가
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUserId(user.uid); // 로그인한 사용자가 있으면 userId 설정
-      } else {
-        setUserId(null); // 로그인한 사용자가 없으면 userId를 null로 설정
-      }
-    });
-
-    return () => unsubscribe(); // 컴포넌트가 언마운트될 때 구독 해제
-  }, []);
   const onLogOut = async () => {
     const ok = confirm("Are you sure you want to log out?"); //확인을 누르면, ok 변수가 true가 됨
     if (ok === true) {
@@ -121,7 +109,7 @@ export default function AdditionalComponent() {
       {isMenuVisible && ( // 메뉴 표시 상태에 따라 조건부 렌더링
         <>
           {/* 북마크 목록 버튼 */}
-          <StyledLink to={`/bookmark/${userId}`}>
+          <StyledLink to={`/bookmark`}>
             <MenuWrapper>
               <MenuItem>
                 <svg

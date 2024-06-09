@@ -34,7 +34,7 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "following/:userId", // localhost/following
+        path: "following", // localhost/following
         element: <FollowingUserPost />,
       },
       {
@@ -46,7 +46,7 @@ const router = createBrowserRouter([
         element: <Profile />,
       },
       {
-        path: "bookmark/:userId", // localhost/bookmark
+        path: "bookmark", // localhost/bookmark
         element: <Bookmark />,
       },
       {

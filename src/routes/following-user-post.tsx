@@ -10,7 +10,6 @@ import {
 } from "firebase/firestore";
 import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweets-components/tweets";
-import { useParams } from "react-router-dom";
 import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";
 import { Unsubscribe } from "firebase/auth";
 
@@ -51,7 +50,7 @@ export interface User {
 export default function FollowingUserPost() {
   //유저 이미지를 state로 만듦
   const [tweets, setTweets] = useState<ITweet[]>([]); //사용자의 트윗 목록을 저장 - ITweet[] 타입의 초기 상태를, 빈 배열로 설정 (ITweet는 트윗 객체를 나타내는 타입(인터페이스))
-  const { userId } = useParams(); //현재 URL의 파라미터를 가져올 때 사용하는 훅 (useParams를 사용하여 userId 파라미터 값 추출)
+  const userId = auth.currentUser?.uid;
 
   const [Users, setUsers] = useState<User[]>([]); //팔로우 하는 유저들의 아이디를 담을 배열(기본 값은 빈 배열)
   const currentUser = auth.currentUser;
