@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import styled from "styled-components";
@@ -30,44 +30,38 @@ export default function BookmarkClick({ userId, tweetId }: BookmarkClickProps) {
   const onClick = async () => {
     try {
       // Firestore에서 현재 사용자의 데이터를 찾음
-      const userRef = doc(db, "users", userId);
-      const docSnap = await getDoc(userRef);
+      // '북마크'를 추가하기 위한 문서 경로 생성
+      const bookmarkPath = `users/${userId}/bookmarks/${tweetId}`;
+      const bookmarkDocRef = doc(db, bookmarkPath);
+      const bookmarkDoc = await getDoc(bookmarkDocRef); // 내 해당 트윗 문서가 이미 존재하는지 확인
 
-      if (docSnap.exists()) {
-        // 사용자의 데이터에서 bookmark항목을 가져옴
-        let bookmarks = docSnap.data().bookmark || [];
-        // 현재 트윗의 id가 이미 bookmarks에 있는지 확인
-        if (bookmarks.includes(tweetId)) {
-          // 이미 북마크가 되어있으면 제거
-          //bookmarks 배열의 각 요소(즉, 각 id)를 tweetId와 비교하여, tweetId와 같지 않은 모든 id들만을 새 배열로 모음
-          bookmarks = bookmarks.filter((id: string) => id !== tweetId);
-          setIsBookmarked(false);
-        } else {
-          // 북마크에 추가
-          bookmarks.push(tweetId); // 북마크 배열에 트윗 ID를 추가
-          setIsBookmarked(true);
-        }
-        // 데이터베이스에 변경사항을 업데이트
-
-        await updateDoc(userRef, {
-          bookmark: bookmarks,
+      if (bookmarkDoc.exists()) {
+        // 북마크 목록에 존재하면 삭제
+        await deleteDoc(bookmarkDocRef);
+        console.log("북마크 목록에서 삭제되었습니다");
+        setIsBookmarked(false);
+      } else {
+        // '북마크' 문서 생성 - 정보 추가
+        await setDoc(bookmarkDocRef, {
+          userId: userId,
+          createdAt: Date.now(),
         });
+        console.log("북마크 목록에 추가되었습니다.");
+        setIsBookmarked(true);
       }
     } catch (error) {
-      console.error("Error updating bookmarks: ", error);
+      console.error("Error adding/removing bookmark: ", error);
     }
   };
 
   // 컴포넌트가 마운트될 때, 북마크 상태를 확인
   useEffect(() => {
     const checkBookmark = async () => {
-      // Firestore에서 현재 사용자의 데이터를 찾음
-      const userRef = doc(db, "users", userId);
-      const docSnap = await getDoc(userRef);
-      if (docSnap.exists()) {
-        const bookmark = docSnap.data().bookmark || [];
-        setIsBookmarked(bookmark.includes(tweetId));
-      }
+      const bookmarkPath = `users/${userId}/bookmarks/${tweetId}`;
+      const bookmarkDocRef = doc(db, bookmarkPath);
+      const bookmarkDoc = await getDoc(bookmarkDocRef); // 내 해당 트윗 문서가 이미 존재하는지 확인
+
+      setIsBookmarked(bookmarkDoc.exists());
     };
     checkBookmark();
   }, [userId, tweetId]);

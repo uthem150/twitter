@@ -1,10 +1,16 @@
 import styled from "styled-components";
 import { auth, db } from "../firebase";
 import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweets-components/tweets";
-import { useParams } from "react-router-dom";
 import BackgroundAnimation from "../components/BackgroundStyle/BackgroundAnimation";
 
 const Wrapper = styled.div`
@@ -35,44 +41,46 @@ export default function Bookmark() {
 
   //유저 이미지를 state로 만듦
   const [tweets, setTweets] = useState<ITweet[]>([]); //사용자의 트윗 목록을 저장 - ITweet[] 타입의 초기 상태를, 빈 배열로 설정 (ITweet는 트윗 객체를 나타내는 타입(인터페이스))
-  const { userId } = useParams(); //현재 URL의 파라미터를 가져올 때 사용하는 훅 (useParams를 사용하여 userId 파라미터 값 추출)
 
   useEffect(() => {
     const fetchTweets = async () => {
-      if (!userId) return;
+      if (!currentUser?.uid) return;
 
-      const userRef = doc(db, "users", userId);
-      const userSnap = await getDoc(userRef);
-
-      if (userSnap.exists()) {
-        const bookmarkedTweetsIds = userSnap.data().bookmark; // 현재 사용자의 북마크 배열 가져옴
-
-        const tweetsPromises = bookmarkedTweetsIds.map(
-          (tweetId: string) => getDoc(doc(db, "tweets", tweetId)) // 각 북마크된 게시글 ID에 대해 문서 가져옴
+      //Firestore에서 북마크 컬렉션을 참조
+      try {
+        const bookmarksRef = collection(
+          db,
+          "users",
+          currentUser?.uid,
+          "bookmarks"
         );
 
-        // 모든 프로미스가 해결될 때까지 기다림
-        const tweetsDocs = await Promise.all(tweetsPromises);
+        const q = query(bookmarksRef, orderBy("createdAt", "asc")); //북마크 컬렉션 createdAt 필드로 내림차순 정렬하는 쿼리
+        const querySnapshot = await getDocs(q); //쿼리 결과를 가져옴
 
-        const tweetsArray = tweetsDocs // 데이터베이스에서 가져온 문서 스냅샷의 배열
-          .filter((docSnap) => docSnap.exists()) // 존재하는 문서만 필터링
-          .map((docSnap) => ({
-            //필터링된 문서 스냅샷들을 순회하면서, 각 문서의 데이터(docSnap.data())를 가져와서 새로운 객체로 만듦
-            ...docSnap.data(),
-            id: docSnap.id,
-          }));
+        // 각 북마크 문서에 대해 트윗 데이터 가져옴
+        // 쿼리에 의해 반환된 문서들 집합 (querySnapshot.docs : 각 문서의 스냅샷을 배열로 포함)
+        const tweetsPromises = querySnapshot.docs.map(async (docSnap) => {
+          // doc() 함수를 사용하여 "tweets" 컬렉션의 각 문서에 대한 참조 생성
+          // getDoc() 함수에 이 참조 전달하여, 문서 데이터를 비동기적으로 조회 (await 키워드: getDoc() 함수 처리 완료될 때까지 기다림)
+          const tweetDoc = await getDoc(doc(db, "tweets", docSnap.id));
 
-        // tweets 배열을 역순으로 정렬하여 상태에 설정
-        setTweets([...tweetsArray].reverse());
-      } else {
-        console.log("사용자 데이터를 찾을 수 없습니다.");
+          // 각 문서의 데이터(tweetDoc.data()), 문서 ID(tweetDoc.id)를 포함하는 객체 생성하여 반환
+          // 객체 ITweet 타입으로 캐스팅
+          return { ...tweetDoc.data(), id: tweetDoc.id } as ITweet;
+        });
+
+        const tweetsArray = await Promise.all(tweetsPromises); //모든 프로미스가 완료된 후 트윗 데이터 배열로 저장
+        setTweets(tweetsArray);
+      } catch (error) {
+        console.error("북마크를 가져오는 중 오류가 발생했습니다.", error);
       }
     };
 
     if (currentUser?.uid) {
       fetchTweets();
     }
-  }, [currentUser?.uid, userId]);
+  }, [currentUser?.uid]);
 
   return (
     <>
