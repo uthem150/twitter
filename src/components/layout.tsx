@@ -109,26 +109,6 @@ export default function Layout() {
             </svg>
           </MenuItem>
         </Link>{" "}
-        {/* tweet작성 버튼 */}
-        <Link to={`/post`}>
-          <MenuItem>
-            <svg
-              data-slot="icon"
-              fill="none"
-              strokeWidth="1.5"
-              stroke="white"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              ></path>
-            </svg>
-          </MenuItem>
-        </Link>
         {/* 검색 버튼 */}
         <Link to={`/search`}>
           <MenuItem className="search">
