@@ -13,6 +13,12 @@ const Wrapper = styled.div`
   margin-bottom: 10px;
   width: 100%;
   max-width: 960px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr; // 단일 열로 변경
+    grid-template-rows: 1fr auto; // 행을 추가하여 푸터 영역 확보
+    height: auto;
+  }
 `;
 
 const Menu = styled.div`
@@ -20,6 +26,17 @@ const Menu = styled.div`
   flex-direction: column; //메인 축(main axis) : 수평방향
   align-items: center; //메인 축(main axis)과 직각으로 교차하는 축인, 교차 축(cross axis)을 따라 Flexbox 컨테이너 내 아이템들을 어떻게 정렬할지 결정
   gap: 20px;
+
+  @media (max-width: 600px) {
+    flex-direction: row; // 가로 방향으로 변경
+    justify-content: space-around; // 버튼들 균등하게 분배
+    position: fixed; // 고정 위치
+    bottom: 0; // 하단에 위치
+    width: 100%; // 전체 너비 사용
+    background-color: #000; // 배경 색상 설정
+    padding: 5px 0; // 상하 패딩
+    border-top: 0.3px solid gray;
+  }
 `;
 
 const MenuItem = styled.div`
@@ -51,6 +68,16 @@ const MenuItem = styled.div`
   transition: transform 0.3s ease; // 변환(크기, 위치 등)에 대해 0.3초 동안 부드럽게 변화
   &:hover {
     transform: scale(1.05); // 호버 시 버튼을 5% 확대
+  }
+
+  @media (max-width: 600px) {
+    border: none;
+    height: 43px;
+    width: 43px;
+    svg {
+      width: 27px;
+      fill: white;
+    }
   }
 `;
 

@@ -48,6 +48,10 @@ const FloatingButton = styled(Link)`
   bottom: 20px; // 화면 아래에서 20px 위로
   right: 20px; // 화면 오른쪽에서 20px 왼쪽으로
   z-index: 1000; // 다른 요소들 위에 표시되도록 z-index 설정
+
+  @media (max-width: 600px) {
+    bottom: 60px; // 푸터 고려하여, 화면 아래에서 70px 위로
+  }
 `;
 
 export default function Home() {
