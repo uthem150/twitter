@@ -20,6 +20,7 @@ export interface User {
 
 const Wrapper = styled.div`
   display: flex;
+  align-items: center;
   gap: 5px;
   flex-direction: column;
   overflow-y: scroll;
@@ -28,13 +29,14 @@ const Wrapper = styled.div`
 `;
 
 const TextArea = styled.textarea`
+  margin-top: 50px;
   border: 2px solid white;
   padding: 20px;
   border-radius: 20px;
   font-size: 16px;
   color: white;
   background-color: rgba(0, 0, 0, 0.5); //투명도 50%
-  width: 100%;
+  width: 95%;
   resize: none; //textarea 크기 조정기능 제거
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
@@ -48,6 +50,13 @@ const TextArea = styled.textarea`
     border-color: #1d9bf0;
   }
   margin-bottom: 10px;
+`;
+
+const UserWrapper = styled.div`
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px; // 간격 설정
 `;
 
 export default function Search() {
@@ -87,7 +96,6 @@ export default function Search() {
   return (
     <>
       <BackgroundAnimation />
-
       <Wrapper>
         <TextArea
           rows={1}
@@ -96,9 +104,11 @@ export default function Search() {
           value={searchTerm}
           placeholder="Search"
         />
-        {users.map((user) => (
-          <FollowUser key={user.userId} {...user} />
-        ))}
+        <UserWrapper>
+          {users.map((user) => (
+            <FollowUser key={user.userId} {...user} />
+          ))}
+        </UserWrapper>
       </Wrapper>
     </>
   );

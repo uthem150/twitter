@@ -5,9 +5,19 @@ import { Link } from "react-router-dom";
 
 const Wrapper = styled.div`
   display: grid;
-  gap: 30px;
-  overflow-y: scroll; //양식은 고정된 상태에서 내용을 스크롤
+  /* gap: 30px; */
   /* grid-template-rows: 1fr 5fr; */
+  overflow-y: scroll; //양식은 고정된 상태에서 내용을 스크롤
+  grid-template-rows: auto 1fr auto; // 헤더, 메인, 푸터의 비율을 설정
+  height: 100vh;
+`;
+
+const MainContent = styled.main`
+  margin-top: 30px;
+  margin-bottom: 10px;
+  @media (max-width: 600px) {
+    margin-top: 60px;
+  }
 `;
 
 const MenuItem = styled.div`
@@ -54,13 +64,36 @@ const FloatingButton = styled(Link)`
   }
 `;
 
+const Header = styled.header`
+  display: none; // 기본 상태에서는 숨김
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  background-color: #000; // 헤더 배경 색상 설정
+  border-bottom: 0.3px solid lightgray; // 헤더 하단에 경계선 추가
+  width: 100%;
+
+  font-size: 24px;
+  color: white;
+  font-family: "Lobster", sans-serif; // 폰트 적용
+  position: fixed; // 고정 위치
+  top: 0;
+  z-index: 1000; // 다른 요소들 위에 표시되도록 z-index 설정
+
+  @media (max-width: 600px) {
+    display: flex; // 600px 이하일 때 요소를 보이게 함
+  }
+`;
+
 export default function Home() {
   return (
     <>
       <Wrapper>
-        <BackgroundAnimation />
-        {/* <PostTweetForm /> */}
-        <Timeline />
+        <Header>Universe</Header>
+        <MainContent>
+          <BackgroundAnimation />
+          <Timeline />
+        </MainContent>
       </Wrapper>
       {/* tweet작성 버튼 */}
       <FloatingButton to={`/post`}>
