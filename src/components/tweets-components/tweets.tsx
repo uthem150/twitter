@@ -59,22 +59,11 @@ const Payload = styled.p`
   line-height: 1.5; // 줄간격
 `;
 
-const DeleteButton = styled.div`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 25px;
-  width: 25px;
-  transition: transform 0.3s ease; // 변환(크기, 위치 등)에 대해 0.3초 동안 부드럽게 변화
-  &:hover {
-    transform: scale(1.05); // 호버 시 버튼을 5% 확대
-  }
-`;
-
 const ButtonContainer = styled.div`
   display: flex;
+  flex-direction: column;
   gap: 5px; // 버튼 사이 간격
+  align-items: flex-end;
 `;
 
 const ActionContainer = styled.div`
@@ -85,8 +74,6 @@ const ActionContainer = styled.div`
   justify-content: flex-start; //시작점 기준으로 요소들을 정렬
   align-items: center;
 `;
-
-const EditButton = styled(DeleteButton)``; // 스타일은 삭제 버튼과 동일
 
 const UserInfoContainer = styled.div`
   display: flex;
@@ -125,6 +112,48 @@ const StatsContainer = styled.div`
   margin-right: 10px;
 `;
 
+const MenuItem = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  width: 35px;
+
+  svg {
+    width: 25px;
+  }
+  &.delete {
+    //클래스명이 log-out인 MenuItem타겟
+    /* border-color: tomato; */
+    svg {
+      fill: tomato;
+    }
+  }
+  transition: transform 0.3s ease; // 변환(크기, 위치 등)에 대해 0.3초 동안 부드럽게 변화
+  &:hover {
+    transform: scale(1.05); // 호버 시 버튼을 5% 확대
+  }
+`;
+
+const Text = styled.span`
+  color: white;
+  font-size: 14px;
+`;
+
+const MenuWrapper = styled.div`
+  width: 110px;
+  gap: 7px;
+  display: grid;
+  grid-template-columns: 1fr 4fr; //1:4 비율로 열의 너비 차지
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  padding: 3px;
+  border-radius: 7px;
+`;
+
 export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
   const user = auth.currentUser;
   const [isEditing, setIsEditing] = useState(false); //수정중인지 상태
@@ -134,6 +163,8 @@ export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
 
   const [cmtClicked, setCmtClicked] = useState(false); // 댓글 버튼 눌렸는지 상태 확인
   const [cmtCount, setCmtCount] = useState(0); // 댓글 개수를 위한 상태
+
+  const [isMenuVisible, setIsMenuVisible] = useState(false); // MenuItem 표시 상태 추가
 
   // comment컴포넌트에서 받은 cmt버튼이 클릭 되었는지 여부를 관리하는 함수
   const handleCmtClicked = (returnValue: boolean) => {
@@ -226,6 +257,11 @@ export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
     fetchCmtCount();
   }, [id, userId]); // tweetId와 userId가 변경될 때마다 이 useEffect를 다시 실행
 
+  const toggleMenu = () => {
+    // 메뉴 표시 상태 토글 함수
+    setIsMenuVisible(!isMenuVisible);
+  };
+
   return (
     <Wrapper>
       <Column>
@@ -252,62 +288,104 @@ export default function Tweet({ photo, tweet, userId, id, createdAt }: ITweet) {
           <PostTime createdAt={createdAt}></PostTime>
         </UserInfoContainer>
         {/* user?.uid는 JavaScript의 Optional Chaining (?.) 연산자 -  user 객체가 null이거나 undefined가 아닐 경우에만 uid 속성에 접근(타입에러 방지) */}
+
         {user?.uid === userId ? (
           <ButtonContainer>
-            <EditButton onClick={onEdit}>
-              {isEditing ? (
-                // 취소 아이콘 SVG 코드
-                <svg
-                  data-slot="icon"
-                  fill="none"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18 18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              ) : (
-                // 수정(펜) 아이콘 SVG 코드
-                <svg
-                  data-slot="icon"
-                  fill="none"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                  ></path>
-                </svg>
-              )}
-            </EditButton>
-            <DeleteButton onClick={onDelete}>
+            <MenuItem>
               <svg
+                onClick={toggleMenu} // SVG 클릭 시 메뉴 표시 상태 토글
                 data-slot="icon"
                 fill="none"
                 strokeWidth="1.5"
-                stroke="tomato"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
               >
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
                 ></path>
               </svg>
-            </DeleteButton>
+            </MenuItem>
+
+            {isMenuVisible && ( // 메뉴 표시 상태에 따라 조건부 렌더링
+              <>
+                <MenuWrapper>
+                  <MenuItem onClick={onEdit}>
+                    {isEditing ? (
+                      // 취소 아이콘 SVG 코드
+                      <svg
+                        data-slot="icon"
+                        fill="none"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18 18 6M6 6l12 12"
+                        ></path>
+                      </svg>
+                    ) : (
+                      // 수정(펜) 아이콘 SVG 코드
+                      <svg
+                        data-slot="icon"
+                        fill="none"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                        ></path>
+                      </svg>
+                    )}
+                  </MenuItem>
+                  <Text
+                    onClick={() => {
+                      onEdit();
+                    }}
+                  >
+                    Edit
+                  </Text>
+                </MenuWrapper>
+                <MenuWrapper>
+                  <MenuItem onClick={onDelete}>
+                    <svg
+                      data-slot="icon"
+                      fill="none"
+                      strokeWidth="1.5"
+                      stroke="tomato"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                      ></path>
+                    </svg>
+                  </MenuItem>
+                  <Text
+                    onClick={() => {
+                      onDelete();
+                    }}
+                  >
+                    Delete
+                  </Text>
+                </MenuWrapper>
+              </>
+            )}
           </ButtonContainer>
         ) : null}
       </Column>
