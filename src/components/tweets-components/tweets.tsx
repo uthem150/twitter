@@ -34,7 +34,7 @@ const Wrapper = styled.li`
 const Column = styled.div`
   display: flex;
   flex-direction: row; /* 가로 방향으로 아이템 나열 */
-  align-items: center; /* 세로축 중앙 정렬 */
+  align-items: flex-start; /* 토글 버튼 열면, 아래로 확장되도록 */
   justify-content: space-between; /* 시작점과 끝점 사이에 요소들 배치 */
   width: 100%;
 `;
