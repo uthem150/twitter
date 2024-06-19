@@ -29,6 +29,13 @@ const Wrapper = styled.li`
   border-radius: 15px;
   list-style: none; // li 요소 스타일 제거
   background-color: rgba(0, 0, 0, 0.5); //투명도 50%
+
+  @media (max-width: 600px) {
+    border-radius: 0px;
+    border: 0.5px solid rgba(255, 255, 255, 0.3);
+    border-left: none;
+    border-right: none;
+  }
 `;
 
 const Column = styled.div`
