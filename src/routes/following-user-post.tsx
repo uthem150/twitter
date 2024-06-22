@@ -18,6 +18,8 @@ const Wrapper = styled.div`
   align-items: center;
   flex-direction: column;
   gap: 20px;
+  overflow-y: scroll; //양식은 고정된 상태에서 내용을 스크롤
+  height: 100vh;
 `;
 
 const Tweets = styled.div`
