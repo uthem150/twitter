@@ -53,7 +53,9 @@ const AvatarUpload = styled.label`
   }
 `;
 
-const AvatarNonUpload = styled(AvatarUpload)``; //AvatarUpload 스타일 그대로 적용
+const AvatarNonUpload = styled(AvatarUpload)`
+  margin-top: 20px;
+`; //AvatarUpload 스타일 적용
 
 const AvatarImg = styled.img`
   width: 100%;
