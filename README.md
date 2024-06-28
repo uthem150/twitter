@@ -1,21 +1,24 @@
 # Twitter 클론코딩
 firebase + React
+<br>
 
 접속 주소 : https://twitter-51b11.web.app/
-
+<br>
 
 | PC | Mobile |
 |:------------------------------------:|:------------------------------------:|
 | ![ezgif-1-6e5e955a2c](https://github.com/uthem150/twitter/assets/142042011/8f7b375e-5cdc-4d4b-92ef-9906b5caaf6d)  | ![ezgif-1-677e9cf3a2](https://github.com/uthem150/twitter/assets/142042011/3931ea9c-4728-4a36-959c-0333c6ca4f63) |
 
-
+<br>
 
 ## 🖥️ 프로젝트 소개
 Nodmad Coder의 "트위터 클론코딩"강의를 수강하고, 추가로 여러 기능들을 구현하며 만든, React를 활용한 트위터 프로젝트입니다
+
 <br>
 
 ## 🕰️ 개발 기간
 
+<br>
 
 ### ⚙️ 개발 환경
 - **Framework** : React
@@ -24,6 +27,8 @@ Nodmad Coder의 "트위터 클론코딩"강의를 수강하고, 추가로 여러
 - styled-components : 6.0.7
 - firebase : 10.1.0
 - Deploy : firebase
+
+<br>
 
 ## 📌 주요 구현 기능
 - Email, Google, Github, Social Authentication
@@ -37,6 +42,8 @@ Nodmad Coder의 "트위터 클론코딩"강의를 수강하고, 추가로 여러
 - Bookmark 기능
 - 유저 검색기능 구현
 - floating 버튼, WebView 스타일, 모바일 - 미디어쿼리
+
+<br>
 
 ## 📌 활용 이론
 - Firebase
